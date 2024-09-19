@@ -16,3 +16,4 @@ Det_Rec/best_model/best_rec/best_accuracy.pdparams
 Det_Rec/best_model/best_rec/best_accuracy.pdopt
 Det_Rec/best_model/best_rec/best_accuracy.states
 Det_Rec/best_model/best_rec/config.yaml
+Det_Rec/__pycache__
