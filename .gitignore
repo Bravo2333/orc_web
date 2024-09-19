@@ -8,3 +8,11 @@ out
 gen
 # model files
 !/Det_Rec/best_model/
+Det_Rec/best_model/best_det/best_accuracy.pdopt
+Det_Rec/best_model/best_det/best_accuracy.pdparams
+Det_Rec/best_model/best_det/best_accuracy.states
+Det_Rec/best_model/best_det/config.yaml
+Det_Rec/best_model/best_rec/best_accuracy.pdparams
+Det_Rec/best_model/best_rec/best_accuracy.pdopt
+Det_Rec/best_model/best_rec/best_accuracy.states
+Det_Rec/best_model/best_rec/config.yaml
