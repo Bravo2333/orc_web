@@ -69,10 +69,10 @@ def filter_polygons_by_area(polygons: np.ndarray) -> np.ndarray:
 
     # 计算最大面积的80%
     threshold_area = 0.8 * max_area_in_last_20
-
+    print('threshold_area',threshold_area)
     # Step 4: 删除面积小于阈值的多边形，返回过滤后的多边形
     filtered_polygons = [polygon for polygon, area in polygon_areas if area >= threshold_area]
-
+    print(len(polygons),len(filtered_polygons))
     # 只返回一维数组形式的多边形
     return np.array([polygon for polygon in filtered_polygons])
 # API 接口: 处理图像识别请求
