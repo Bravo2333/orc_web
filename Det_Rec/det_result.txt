@@ -1,0 +1,1 @@
+../test1.jpg_polygon_12_0.png	[{"transcription": "", "points": [[0, 0], [109, 0], [110, 89], [0, 90]]}, {"transcription": "", "points": [[105, 9], [161, 2], [168, 53], [113, 60]]}]
