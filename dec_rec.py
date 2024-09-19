@@ -66,7 +66,7 @@ def recognize_text(detected_results):
         recognized_texts = []
         reshaped_polygon = detected['polygon'].reshape((-1, 2))
         area = cv2.contourArea(reshaped_polygon)
-        detected_area = cv2.contourArea(detected['detected_boxes'])
+        detected_area = cv2.contourArea(np.array(detected['detected_boxes']))
         if detected_area<area/20:
             recognition_results.append({
                 'index': detected['index'],
