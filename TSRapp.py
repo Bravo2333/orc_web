@@ -55,7 +55,7 @@ def filter_polygons_by_area(polygons: np.ndarray) -> np.ndarray:
         polygon_areas.append((polygon, area))
 
     # Step 2: 按面积大小排序
-    polygon_areas.sort(key=lambda x: x[1])
+    polygon_areas.sort(key=lambda x: x[1], reverse=True)
 
     # Step 3: 计算后20%中面积最大的多边形的80%的面积
     num_polygons = len(polygon_areas)
