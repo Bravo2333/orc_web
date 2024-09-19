@@ -59,7 +59,7 @@ def filter_polygons_by_area(polygons: np.ndarray) -> np.ndarray:
 
     # Step 3: 计算后20%中面积最大的多边形的80%的面积
     num_polygons = len(polygon_areas)
-    last_20_percent_count = num_polygons // 5  # 取后20%的多边形数量
+    last_20_percent_count = num_polygons // 20  # 取后20%的多边形数量
     if last_20_percent_count == 0:
         last_20_percent_count = 1  # 至少取一个多边形
     last_20_percent_polygons = polygon_areas[-last_20_percent_count:]
