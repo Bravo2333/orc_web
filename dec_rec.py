@@ -71,31 +71,29 @@ def recognize_text(detected_results):
                 'texts': '识别失败，当前单元格无内容'
             })
             continue
-        for box in detected['detected_boxes']:
-            print(box)
-            # box格式：[[[x1, y1], [x2, y2], [x3, y3], [x4, y4]], (score)]
-            # 提取每个文本区域的坐标，并裁剪出对应区域
-            poly = np.array(box[0], dtype=np.int32)
+        # box格式：[[[x1, y1], [x2, y2], [x3, y3], [x4, y4]], (score)]
+        # 提取每个文本区域的坐标，并裁剪出对应区域
+        poly = np.array(detected['detected_boxes'], dtype=np.int32)
 
-            # 创建用于裁剪的掩膜
-            mask = np.zeros_like(image, dtype=np.uint8)
-            cv2.fillPoly(mask, [poly], (255, 255, 255))
+        # 创建用于裁剪的掩膜
+        mask = np.zeros_like(image, dtype=np.uint8)
+        cv2.fillPoly(mask, [poly], (255, 255, 255))
 
-            # 在原始小图片上裁剪出文本区域
-            cropped_text_area = cv2.bitwise_and(image, mask)
-            x_min = np.min(poly[:, 0])
-            y_min = np.min(poly[:, 1])
-            x_max = np.max(poly[:, 0])
-            y_max = np.max(poly[:, 1])
-            cropped_text_area = cropped_text_area[y_min:y_max, x_min:x_max]
-            success, encoded_image = cv2.imencode('.png', cropped_text_area)
+        # 在原始小图片上裁剪出文本区域
+        cropped_text_area = cv2.bitwise_and(image, mask)
+        x_min = np.min(poly[:, 0])
+        y_min = np.min(poly[:, 1])
+        x_max = np.max(poly[:, 0])
+        y_max = np.max(poly[:, 1])
+        cropped_text_area = cropped_text_area[y_min:y_max, x_min:x_max]
+        success, encoded_image = cv2.imencode('.png', cropped_text_area)
 
-            # 使用 rec 模型识别文本内容
-            rec_result = recinstence.rec_infer(encoded_image.tobytes())
+        # 使用 rec 模型识别文本内容
+        rec_result = recinstence.rec_infer(encoded_image.tobytes())
 
-            # 保存识别出的文本
-            if rec_result and len(rec_result) > 0:
-                recognized_texts.append(rec_result[0][0])  # 取出识别的文本内容
+        # 保存识别出的文本
+        if rec_result and len(rec_result) > 0:
+            recognized_texts.append(rec_result[0][0])  # 取出识别的文本内容
 
         recognition_results.append({
             'index': detected['index'],
