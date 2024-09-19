@@ -72,7 +72,10 @@ def filter_polygons_by_area(polygons: np.ndarray) -> np.ndarray:
     threshold_area = 0.8 * max_area_in_last_20
 
     # Step 4: 删除面积小于阈值的多边形，返回过滤后的多边形
-    filtered_polygons = [polygon for polygon, area in polygon_areas if area >= threshold_area]
+    filtered_polygons = []
+    for polygon, area in polygon_areas:
+        if area >=threshold_area:
+            filtered_polygons.append(polygon)
     print('threshold_area',threshold_area)
     print(len(polygons),len(filtered_polygons))
 
