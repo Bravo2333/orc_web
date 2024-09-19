@@ -11,8 +11,8 @@ Global:
   - 100
   cal_metric_during_train: false
   checkpoints: ''
-#  pretrained_model: ./best_model/best_det/best_accuracy.pdparams
-  pretrained_model: ./Det_Rec/best_model/best_det/best_accuracy.pdparams
+  pretrained_model: ./best_model/best_det/best_accuracy.pdparams
+#  pretrained_model: ./Det_Rec/best_model/best_det/best_accuracy.pdparams
   save_inference_dir: null
   save_res_path: ./det_result.txt
   use_visualdl: false
