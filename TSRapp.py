@@ -96,6 +96,7 @@ def filter_top_50_percent_by_area(polygons: np.ndarray) -> np.ndarray:
         # 将一维数组的多边形转换为二维点集 [(x1, y1), (x2, y2), (x3, y3), (x4, y4)]
         reshaped_polygon = polygon.reshape((-1, 2))  # 将 [x1, y1, x2, y2, ...] 转为 [[x1, y1], [x2, y2], ...]
         area = cv2.contourArea(reshaped_polygon)  # 计算多边形面积
+        print(reshaped_polygon,(polygon, area))
         polygon_areas.append((polygon, area))  # 将多边形及其面积存储为元组
 
     # Step 2: 按面积从大到小排序
@@ -122,9 +123,9 @@ def recognize_table():
     # 将Base64编码的图片转换为OpenCV图像
     image = base64_to_image(base64_image)
     cv2.imwrite('temp.jpg',image)
-    encoded_string, polygons = ccnet.do_TSR('temp.jpg')
-    print(polygons)
-    polygons = filter_top_50_percent_by_area(polygons)
+    encoded_string, origin_polygons = ccnet.do_TSR('temp.jpg')
+    print(origin_polygons)
+    polygons = filter_top_50_percent_by_area(origin_polygons)
     result = {
         "image_base64": encoded_string,
         "polygons": polygons.tolist()
