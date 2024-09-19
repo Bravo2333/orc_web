@@ -83,6 +83,7 @@ def recognize_table():
     image = base64_to_image(base64_image)
     cv2.imwrite('temp.jpg',image)
     encoded_string, polygons = ccnet.do_TSR('temp.jpg')
+    print(polygons)
     polygons = filter_polygons_by_area(polygons)
     result = {
         "image_base64": encoded_string,
