@@ -8,10 +8,6 @@ from Det_Rec.detfromimage import det
 from Det_Rec.recfromimages import rec
 
 # 初始化 OCR 模型 (支持det检测和rec识别)
-recinstence = rec()
-recinstence.rec_init()
-detinstence = det()
-detinstence.det_init()
 
 
 # 定义函数：使用多边形信息切割图片
@@ -38,11 +34,14 @@ def split_image_by_polygons(image, polygons):
 
 # 定义函数：使用det模型检测文本位置
 def detect_text_positions(cropped_images):
+    detinstence = det()
+    detinstence.det_init()
     detected_results = []
+    num = 1
     for cropped in cropped_images:
         image = cropped['image']
         success, encoded_image = cv2.imencode('.png', image)
-
+        print(num)
         # 使用 det 模型检测文本位置
         result = detinstence.det_infer(encoded_image.tobytes())
 
@@ -52,11 +51,14 @@ def detect_text_positions(cropped_images):
             'detected_boxes': result,  # 文本位置框
             'image': image  # 保留原始小图
         })
+        num+=1
     return detected_results
 
 
 # 定义函数：根据det模型检测结果裁剪出文本区域，并传递给rec模型进行文本识别
 def recognize_text(detected_results):
+    recinstence = rec()
+    recinstence.rec_init()
     recognition_results = []
 
     for detected in detected_results:
@@ -70,6 +72,7 @@ def recognize_text(detected_results):
             })
             continue
         for box in detected['detected_boxes']:
+            print(box)
             # box格式：[[[x1, y1], [x2, y2], [x3, y3], [x4, y4]], (score)]
             # 提取每个文本区域的坐标，并裁剪出对应区域
             poly = np.array(box[0], dtype=np.int32)

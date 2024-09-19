@@ -20,7 +20,7 @@ import numpy as np
 
 import os
 import sys
-
+import gc
 __dir__ = os.path.dirname(os.path.abspath(__file__))
 
 sys.path.append(__dir__)
@@ -173,6 +173,7 @@ class det:
         self.configpath = './detconfig.yaml'
         self.config, self.device, self.logger, self.vdl_writer = self.preprocess()
         self.det_init()
+
     def preprocess(self, is_train=False):
         config = load_config(self.configpath)
         log_file = None
@@ -270,7 +271,8 @@ class det:
         self.model.eval()
         # build post process
         self.post_process_class = build_post_process(self.config["PostProcess"])
-    def det_infer(self,img):
+
+    def det_infer(self, img):
         data = {"image": img}
         batch = transform(data, self.ops)
 
@@ -279,9 +281,6 @@ class det:
         images = paddle.to_tensor(images)
         preds = self.model(images)  # 计算结果
         post_result = self.post_process_class(preds, shape_list)
-
-        src_img = img
-
         dt_boxes_json = []
         # parser boxes if post_result is dict
         if isinstance(post_result, dict):
@@ -302,8 +301,10 @@ class det:
                 tmp_json = {"transcription": ""}
                 tmp_json["points"] = np.array(box).tolist()
                 dt_boxes_json.append(tmp_json)
-        if len(dt_boxes_json)==0:
+        if len(dt_boxes_json) == 0:
             return None
+        paddle.device.cuda.empty_cache()
+        gc.collect()
         return dt_boxes_json[0]['points']
         #         otstr = file + "\t" + json.dumps(dt_boxes_json) + "\n"
         #         fout.write(otstr.encode())
@@ -311,13 +312,14 @@ class det:
         # logger.info("success!")
 
 
-if __name__ == "__main__":
-    filelist = ['../test1.jpg_polygon_12_0.png','../test1.jpg_polygon_12_0.png','../test1.jpg_polygon_12_0.png','../test1.jpg_polygon_12_0.png','../test1.jpg_polygon_12_0.png']
-    detinstence = det()
-    detinstence.det_init()
-    # with open(filelist[0], "rb") as f:
-    #     img = f.read()
-    for i in filelist:
-        img = cv2.imread(i)
-        success, encoded_image = cv2.imencode('.png', img)
-        print(detinstence.det_infer(encoded_image.tobytes()))
+# if __name__ == "__main__":
+#     filelist = ['../test1.jpg_polygon_12_0.png', '../test1.jpg_polygon_12_0.png', '../test1.jpg_polygon_12_0.png',
+#                 '../test1.jpg_polygon_12_0.png', '../test1.jpg_polygon_12_0.png']
+#     detinstence = det()
+#     detinstence.det_init()
+#     # with open(filelist[0], "rb") as f:
+#     #     img = f.read()
+#     for i in filelist:
+#         img = cv2.imread(i)
+#         success, encoded_image = cv2.imencode('.png', img)
+#         print(detinstence.det_infer(encoded_image.tobytes()))
