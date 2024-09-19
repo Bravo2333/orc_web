@@ -40,14 +40,19 @@ def base64_to_image(base64_str):
 def filter_polygons_by_area(polygons: np.ndarray) -> np.ndarray:
     """
     按面积大小排序并删除面积小于后20%中面积最大的多边形面积的80%的多边形
-    :param polygons: 输入的多边形列表, 形如 [N, M, 2] 的 ndarray，N 是多边形个数，M 是顶点数，2 表示 x, y 坐标
+    :param polygons: 输入的多边形列表，每个多边形形如 [x1, y1, x2, y2, ..., xn, yn]
     :return: 过滤后的多边形列表，格式同输入
     """
     if polygons.size == 0:
         return np.array([])
 
     # Step 1: 计算每个多边形的面积
-    polygon_areas = [(i, cv2.contourArea(polygons[i])) for i in range(polygons.shape[0])]
+    polygon_areas = []
+    for polygon in polygons:
+        # 将一维数组的多边形转换为二维点集 [(x1, y1), (x2, y2), ...]
+        reshaped_polygon = polygon.reshape((-1, 2))  # 将 [x1, y1, x2, y2, ...] 转为 [[x1, y1], [x2, y2], ...]
+        area = cv2.contourArea(reshaped_polygon)
+        polygon_areas.append((polygon, area))
 
     # Step 2: 按面积大小排序
     polygon_areas.sort(key=lambda x: x[1])
@@ -66,10 +71,10 @@ def filter_polygons_by_area(polygons: np.ndarray) -> np.ndarray:
     threshold_area = 0.8 * max_area_in_last_20
 
     # Step 4: 删除面积小于阈值的多边形，返回过滤后的多边形
-    filtered_indices = [i for i, area in polygon_areas if area >= threshold_area]
-    filtered_polygons = polygons[filtered_indices]
+    filtered_polygons = [polygon for polygon, area in polygon_areas if area >= threshold_area]
 
-    return filtered_polygons
+    # 只返回一维数组形式的多边形
+    return np.array([polygon for polygon in filtered_polygons])
 # API 接口: 处理图像识别请求
 @app.route('/api/recognize', methods=['POST'])
 def recognize_table():
