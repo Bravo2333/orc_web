@@ -124,11 +124,12 @@ def recognize_table():
     image = base64_to_image(base64_image)
     cv2.imwrite('temp.jpg',image)
     encoded_string, origin_polygons = ccnet.do_TSR('temp.jpg')
-    print(origin_polygons)
-    polygons = filter_top_50_percent_by_area(origin_polygons)
+    # print(origin_polygons)
+    # polygons = filter_top_50_percent_by_area(origin_polygons)
     result = {
         "image_base64": encoded_string,
-        "polygons": polygons.tolist()
+        # "polygons": polygons.tolist(),
+        "polygons": origin_polygons.tolist()
     }
     return jsonify(result)
 
