@@ -103,7 +103,7 @@ def recognize_text(detected_results):
 
         # 保存识别出的文本
         if rec_result and len(rec_result) > 0:
-            recognized_texts.append(rec_result[0])  # 取出识别的文本内容
+            recognized_texts.append(rec_result)  # 取出识别的文本内容
 
         recognition_results.append({
             'index': detected['index'],
