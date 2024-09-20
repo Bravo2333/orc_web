@@ -26,6 +26,12 @@ def base64_to_image(base64_str):
     np_arr = np.frombuffer(img_data, np.uint8)
     image = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
     return image
+def fix_base64_padding(base64_string):
+    # 计算需要的填充数，使得字符串长度是4的倍数
+    missing_padding = len(base64_string) % 4
+    if missing_padding != 0:
+        base64_string += '=' * (4 - missing_padding)
+    return base64_string
 # API 接口: 处理图像识别请求
 @app.route('/api/recognize', methods=['POST'])
 def recognize_table():
@@ -34,7 +40,7 @@ def recognize_table():
     random_filename = f"{uuid.uuid4()}.jpg"
     if not base64_image:
         return jsonify({"error": "No image provided"}), 400
-
+    base64_image = fix_base64_padding(base64_image)
     # 将Base64编码的图片转换为OpenCV图像
     image = base64_to_image(base64_image)
 
