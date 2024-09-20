@@ -66,7 +66,7 @@ def recognize_text(detected_results):
         recognized_texts = []
         if detected['detected_boxes']==None:
             recognition_results.append({
-                'index': detected['index'].tolist(),
+                'index': detected['index'],
                 'polygon': detected['polygon'].tolist(),
                 'texts': '识别失败，当前单元格无有效检测区域'
             })
@@ -106,7 +106,7 @@ def recognize_text(detected_results):
             recognized_texts.append(rec_result)  # 取出识别的文本内容
 
         recognition_results.append({
-            'index': detected['index'].tolist(),
+            'index': detected['index'],
             'polygon': detected['polygon'].tolist(),
             'texts': recognized_texts
         })
