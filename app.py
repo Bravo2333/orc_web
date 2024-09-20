@@ -55,10 +55,10 @@ def recognize_table():
         # 执行主流程
         recognition_results = getrec_result(image_path, polygons, output_text_path)
         # 处理图片，模拟表格识别并返回结果
-        print(type(),type(recognition_results))
         result ={}
         result['base64'] = base64_result_image
         result['recognition_results'] = recognition_results
+        print(type(result))
         # 返回识别的图片和文本结果
         return jsonify(result)
 
