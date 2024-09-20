@@ -40,6 +40,7 @@ def recognize_table():
     random_filename = f"{uuid.uuid4()}.jpg"
     
     base64_image = fix_base64_padding(base64_image)
+    print(base64_image)
     # 将Base64编码的图片转换为OpenCV图像
     image = base64_to_image(base64_image)
 
