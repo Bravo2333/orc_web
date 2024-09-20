@@ -47,8 +47,8 @@ def recognize_table():
     # 将解码后的二进制数据写入文件
     with open(image_path, "wb") as image_file:
         image_file.write(image_data)
-    with open('base64.txt', "wb") as image_file:
-        image_file.write(base64_image)
+    # with open('base64.txt', "wb") as image_file:
+    #     image_file.write(base64_image)
     if base64_image:
         # 保存上传的图片
         output_text_path = 'recognized_texts.txt'
