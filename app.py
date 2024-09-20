@@ -28,13 +28,26 @@ def base64_to_image(base64_str):
     np_arr = np.frombuffer(img_data, np.uint8)
     image = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
     return image
-def remove_base64_prefix(base64_string):
+
+
+def extract_base64_prefix(base64_string):
     """
-    移除 Base64 编码中的任何类型的前缀
+    提取并移除 Base64 编码中的前缀，返回前缀和去除前缀后的Base64数据
     """
-    # 使用正则表达式去除以"data:"开头并包含逗号的前缀
-    base64_data = re.sub(r'^data:.*?;base64,', '', base64_string)
-    return base64_data
+    # 使用正则表达式提取前缀
+    match = re.match(r'^(data:.*?;base64,)', base64_string)
+
+    if match:
+        # 如果有前缀，提取前缀
+        prefix = match.group(1)
+        # 移除前缀
+        base64_data = re.sub(r'^data:.*?;base64,', '', base64_string)
+    else:
+        # 如果没有前缀
+        prefix = None
+        base64_data = base64_string
+
+    return prefix, base64_data
 # API 接口: 处理图像识别请求
 @app.route('/api/recognize', methods=['POST'])
 def recognize_table():
@@ -42,7 +55,7 @@ def recognize_table():
     base64_image = data.get('image')
     random_filename = f"{uuid.uuid4()}.png"
 
-    base64_image = remove_base64_prefix(base64_image)
+    prefix,base64_image = extract_base64_prefix(base64_image)
     image_path = os.path.join(app.config['UPLOAD_FOLDER'], random_filename)
     image_data = base64.b64decode(base64_image)
     print(image_path)
@@ -64,7 +77,7 @@ def recognize_table():
         # 发送POST请求到Flask服务
         response = requests.post('http://127.0.0.1:5000/api/recognize', json=payload)
         data = response.json()
-        base64_result_image = data['image_base64']
+        base64_result_image = prefix+data['image_base64']
         # 假设有两个多边形，4个点定义一个多边形
         polygons_list = data['polygons']
         print(polygons_list)
