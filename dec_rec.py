@@ -158,7 +158,7 @@ if __name__ == '__main__':
         "image": base64_image
     }
     # 发送POST请求到Flask服务
-    response = requests.post('http://127.0.0.1:3000/api/recognize', json=payload)
+    response = requests.post('http://127.0.0.1:5000/api/recognize', json=payload)
     data = response.json()
     base64_result_image = data['image_base64']
     # 假设有两个多边形，4个点定义一个多边形
