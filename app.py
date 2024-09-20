@@ -40,9 +40,9 @@ def recognize_table():
     random_filename = f"{uuid.uuid4()}.jpg"
 
     base64_image = fix_base64_padding(base64_image)
-    print(base64_image)
     image_path = os.path.join(app.config['UPLOAD_FOLDER'], random_filename)
     image_data = base64.b64decode(base64_image)
+    print(base64_image,image_path)
 
     # 将解码后的二进制数据写入文件
     with open(image_path, "wb") as image_file:
