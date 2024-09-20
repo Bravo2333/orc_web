@@ -3,7 +3,8 @@ import base64
 import json
 
 # Flask服务器地址
-url = "http://127.0.0.1:3000/api/recognize"  # 替换为你的Flask接口地址
+# url = "http://127.0.0.1:3000/api/recognize"  # 替换为你的Flask接口地址
+url = "http://gj03.khdxs7.site:20401/api/recognize"  # 替换为你的Flask接口地址
 
 # 本地待上传图片路径
 image_path = "table1_1.png"
@@ -21,16 +22,16 @@ if response.status_code == 200:
     response_data = response.json()
 
     # 从返回数据中提取base64编码的图片
-    # base64_image = response_data['base64']
+    base64_image = response_data['base64']
 
     # 解码base64并保存为图片文件
-    # with open(output_image_path, "wb") as output_image:
-    #     output_image.write(base64.b64decode(base64_image))
+    with open(output_image_path, "wb") as output_image:
+        output_image.write(base64.b64decode(base64_image))
 
     # 提取识别结果并保存到文本文件中
     recognition_results = response_data['recognition_results']
     with open(output_text_path, "w") as output_text:
-        output_text.write(recognition_results)
+        output_text.write(str(recognition_results))
 
     print(f"Image saved to {output_image_path}")
     print(f"Recognition results saved to {output_text_path}")
