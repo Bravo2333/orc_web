@@ -57,10 +57,10 @@ def recognize_table():
         # 处理图片，模拟表格识别并返回结果
         result ={}
         result['base64'] = base64_result_image
-        result['recognition_results'] = recognition_results
+        result['recognition_results'] = str(recognition_results)
         print(type(result))
         # 返回识别的图片和文本结果
-        return jsonify(recognition_results)
+        return jsonify(result)
 
     return jsonify({"error": "Something went wrong"}), 500
 
