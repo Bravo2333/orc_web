@@ -41,12 +41,14 @@ def recognize_table():
 
     base64_image = fix_base64_padding(base64_image)
     print(base64_image)
-    # 将Base64编码的图片转换为OpenCV图像
-    image = base64_to_image(base64_image)
+    image_path = os.path.join(app.config['UPLOAD_FOLDER'], random_filename)
+    image_data = base64.b64decode(base64_image)
+
+    # 将解码后的二进制数据写入文件
+    with open(image_path, "wb") as image_file:
+        image_file.write(image_data)
     if base64_image:
         # 保存上传的图片
-        image_path = os.path.join(app.config['UPLOAD_FOLDER'], random_filename)
-        cv2.imwrite(image_path, image)
         output_text_path = 'recognized_texts.txt'
         base64_image = image_to_base64(image_path)
 
