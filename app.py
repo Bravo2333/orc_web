@@ -38,15 +38,11 @@ def recognize_table():
     data = request.json
     base64_image = data.get('image')
     random_filename = f"{uuid.uuid4()}.jpg"
-    
+
     base64_image = fix_base64_padding(base64_image)
     print(base64_image)
     # 将Base64编码的图片转换为OpenCV图像
     image = base64_to_image(base64_image)
-
-    if 'image' not in request.files:
-        return jsonify({"error": "No image uploaded"}), 400
-
     if base64_image:
         # 保存上传的图片
         image_path = os.path.join(app.config['UPLOAD_FOLDER'], random_filename)
