@@ -3,7 +3,7 @@ import base64
 import json
 
 # Flask服务器地址
-url = "http://127.0.0.1:5000/api/recognize"  # 替换为你的Flask接口地址
+url = "http://127.0.0.1:3000/api/recognize"  # 替换为你的Flask接口地址
 
 # 本地待上传图片路径
 image_path = "table1_1.png"
