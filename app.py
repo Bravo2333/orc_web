@@ -61,7 +61,7 @@ def recognize_table():
             "image": {
                 "base64": base64_result_image
             },
-            "result": recognition_results
+            "result": recognition_results.tolist()
         })
 
     return jsonify({"error": "Something went wrong"}), 500
