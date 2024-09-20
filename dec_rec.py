@@ -77,7 +77,7 @@ def recognize_text(detected_results):
         if detected_area<area/20:
             recognition_results.append({
                 'index': detected['index'],
-                'polygon': detected['polygon'],
+                'polygon': detected['polygon'].tolist(),
                 'texts': '识别失败，当前单元格检测区域过小'
             })
             continue
