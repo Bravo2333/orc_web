@@ -38,8 +38,7 @@ def recognize_table():
     data = request.json
     base64_image = data.get('image')
     random_filename = f"{uuid.uuid4()}.jpg"
-    if not base64_image:
-        return jsonify({"error": "No image provided"}), 400
+    
     base64_image = fix_base64_padding(base64_image)
     # 将Base64编码的图片转换为OpenCV图像
     image = base64_to_image(base64_image)
