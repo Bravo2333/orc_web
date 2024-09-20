@@ -60,7 +60,7 @@ def recognize_table():
         result['recognition_results'] = recognition_results
         print(type(result))
         # 返回识别的图片和文本结果
-        return jsonify(result)
+        return jsonify(recognition_results)
 
     return jsonify({"error": "Something went wrong"}), 500
 

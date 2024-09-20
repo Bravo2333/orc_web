@@ -21,11 +21,11 @@ if response.status_code == 200:
     response_data = response.json()
 
     # 从返回数据中提取base64编码的图片
-    base64_image = response_data['base64']
+    # base64_image = response_data['base64']
 
     # 解码base64并保存为图片文件
-    with open(output_image_path, "wb") as output_image:
-        output_image.write(base64.b64decode(base64_image))
+    # with open(output_image_path, "wb") as output_image:
+    #     output_image.write(base64.b64decode(base64_image))
 
     # 提取识别结果并保存到文本文件中
     recognition_results = response_data['recognition_results']
