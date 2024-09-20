@@ -1,3 +1,5 @@
+import re
+
 import cv2
 import requests
 from flask import Flask, request, jsonify, send_from_directory
@@ -26,12 +28,13 @@ def base64_to_image(base64_str):
     np_arr = np.frombuffer(img_data, np.uint8)
     image = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
     return image
-def fix_base64_padding(base64_string):
-    # 计算需要的填充数，使得字符串长度是4的倍数
-    missing_padding = len(base64_string) % 4
-    if missing_padding != 0:
-        base64_string += '=' * (4 - missing_padding)
-    return base64_string
+def remove_base64_prefix(base64_string):
+    """
+    移除 Base64 编码中的任何类型的前缀
+    """
+    # 使用正则表达式去除以"data:"开头并包含逗号的前缀
+    base64_data = re.sub(r'^data:.*?;base64,', '', base64_string)
+    return base64_data
 # API 接口: 处理图像识别请求
 @app.route('/api/recognize', methods=['POST'])
 def recognize_table():
@@ -39,7 +42,7 @@ def recognize_table():
     base64_image = data.get('image')
     random_filename = f"{uuid.uuid4()}.png"
 
-    base64_image = fix_base64_padding(base64_image)
+    base64_image = remove_base64_prefix(base64_image)
     image_path = os.path.join(app.config['UPLOAD_FOLDER'], random_filename)
     image_data = base64.b64decode(base64_image)
     print(image_path)
