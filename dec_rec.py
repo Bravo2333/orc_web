@@ -127,7 +127,7 @@ def image_to_base64(image_path):
 
 
 # 示例主流程
-def main(image_path, polygons, output_text_path):
+def getrec_result(image_path, polygons, output_text_path):
     # 读取图片
     image = cv2.imread(image_path)
 
@@ -139,11 +139,11 @@ def main(image_path, polygons, output_text_path):
 
     # 3. 使用rec模型识别文本内容
     recognition_results = recognize_text(detected_results)
-
+    return recognition_results
     # 4. 将识别结果与多边形位置对应，并存储到文本文件
-    save_recognition_results(recognition_results, output_text_path)
-
-    print(f"识别结果已保存到 {output_text_path}")
+    # save_recognition_results(recognition_results, output_text_path)
+    #
+    # print(f"识别结果已保存到 {output_text_path}")
 
 
 # 测试用例
@@ -168,4 +168,4 @@ if __name__ == '__main__':
     polygons = [np.array(polygon) for polygon in polygons]  # 将其转换为numpy格式
 
     # 执行主流程
-    main(image_path, polygons, output_text_path)
+    recognition_results = getrec_result(image_path, polygons, output_text_path)
