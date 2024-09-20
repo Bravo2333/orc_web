@@ -4,8 +4,9 @@ import os
 import base64
 import numpy as np
 from dec_rec import getrec_result
+from flask_cors import CORS
 app = Flask(__name__)
-
+CORS(app)
 # 设置上传文件的静态目录
 UPLOAD_FOLDER = 'static'
 if not os.path.exists(UPLOAD_FOLDER):
