@@ -37,7 +37,7 @@ def fix_base64_padding(base64_string):
 def recognize_table():
     data = request.json
     base64_image = data.get('image')
-    random_filename = f"{uuid.uuid4()}.jpg"
+    random_filename = f"{uuid.uuid4()}.png"
 
     base64_image = fix_base64_padding(base64_image)
     image_path = os.path.join(app.config['UPLOAD_FOLDER'], random_filename)
