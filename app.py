@@ -1,3 +1,4 @@
+import cv2
 import requests
 from flask import Flask, request, jsonify, send_from_directory
 import os
@@ -5,6 +6,7 @@ import base64
 import numpy as np
 from dec_rec import getrec_result
 from flask_cors import CORS
+import uuid
 app = Flask(__name__)
 CORS(app)
 # 设置上传文件的静态目录
@@ -19,23 +21,30 @@ def image_to_base64(image_path):
         return base64.b64encode(image_file.read()).decode('utf-8')
 # 模拟表格识别处理函数
 
-
+def base64_to_image(base64_str):
+    img_data = base64.b64decode(base64_str)
+    np_arr = np.frombuffer(img_data, np.uint8)
+    image = cv2.imdecode(np_arr, cv2.IMREAD_COLOR)
+    return image
 # API 接口: 处理图像识别请求
 @app.route('/api/recognize', methods=['POST'])
 def recognize_table():
+    data = request.json
+    base64_image = data.get('image')
+    random_filename = f"{uuid.uuid4()}.jpg"
+    if not base64_image:
+        return jsonify({"error": "No image provided"}), 400
+
+    # 将Base64编码的图片转换为OpenCV图像
+    image = base64_to_image(base64_image)
+
     if 'image' not in request.files:
         return jsonify({"error": "No image uploaded"}), 400
 
-    file = request.files['image']
-
-    if file.filename == '':
-        return jsonify({"error": "No selected file"}), 400
-
-    if file:
+    if base64_image:
         # 保存上传的图片
-        file_path = os.path.join(app.config['UPLOAD_FOLDER'], file.filename)
-        file.save(file_path)
-        image_path = file_path
+        image_path = os.path.join(app.config['UPLOAD_FOLDER'], random_filename)
+        cv2.imwrite(image_path, image)
         output_text_path = 'recognized_texts.txt'
         base64_image = image_to_base64(image_path)
 
