@@ -127,7 +127,7 @@ def image_to_base64(image_path):
 
 
 # 示例主流程
-def getrec_result(image_path, polygons):
+def getrec_result(image_path, polygons, output_text_path):
     # 读取图片
     image = cv2.imread(image_path)
 
