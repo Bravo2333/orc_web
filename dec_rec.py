@@ -65,11 +65,11 @@ def recognize_text(detected_results):
         image = detected['image']
         recognized_texts = []
         if detected['detected_boxes']==None:
-            recognition_results.append({
-                'index': detected['index'],
-                'polygon': detected['polygon'].tolist(),
-                'texts': '识别失败，当前单元格无有效检测区域'
-            })
+            # recognition_results.append({
+            #     'index': detected['index'],
+            #     'polygon': detected['polygon'].tolist(),
+            #     'texts': '识别失败，当前单元格无有效检测区域'
+            # })
             continue
         reshaped_polygon = detected['polygon'].reshape((-1, 2))
         area = cv2.contourArea(reshaped_polygon)
