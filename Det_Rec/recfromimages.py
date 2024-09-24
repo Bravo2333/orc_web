@@ -413,7 +413,8 @@ class rec:
 
         if info is not None:
             self.logger.info("\t result: {}".format(info))
-
+        if float(info.split('\t')[-1])<=0.5:
+            return "无有效内容"
         return info.split('\t')[0]
 
 

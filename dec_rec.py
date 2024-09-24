@@ -100,6 +100,8 @@ def recognize_text(detected_results):
 
         # 使用 rec 模型识别文本内容
         rec_result = recinstence.rec_infer(encoded_image.tobytes())
+        if rec_result =="无有效内容":
+            continue
 
         # 保存识别出的文本
         if rec_result and len(rec_result) > 0:
