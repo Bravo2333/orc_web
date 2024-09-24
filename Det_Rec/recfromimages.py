@@ -413,6 +413,7 @@ class rec:
 
         if info is not None:
             self.logger.info("\t result: {}".format(info))
+
         return info.split('\t')[0]
 
 

@@ -21,6 +21,7 @@ import numpy as np
 import os
 import sys
 import gc
+
 __dir__ = os.path.dirname(os.path.abspath(__file__))
 
 sys.path.append(__dir__)
@@ -305,12 +306,18 @@ class det:
             return None
         paddle.device.cuda.empty_cache()
         gc.collect()
-        return dt_boxes_json[0]['points']
+        result = [dt_boxes_json[0]['points'], 0]
+        for i in dt_boxes_json:
+            area = cv2.contourArea(np.array(i['points']))
+            if result[1] < area:
+                result[1] = area
+                result[0] = i
+        return result[0]['points']
+        # return dt_boxes_json[0]['points']
         #         otstr = file + "\t" + json.dumps(dt_boxes_json) + "\n"
         #         fout.write(otstr.encode())
         #
         # logger.info("success!")
-
 
 # if __name__ == "__main__":
 #     filelist = ['../test1.jpg_polygon_12_0.png', '../test1.jpg_polygon_12_0.png', '../test1.jpg_polygon_12_0.png',
