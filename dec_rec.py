@@ -7,6 +7,7 @@ import requests
 from Det_Rec.detfromimage import det
 from Det_Rec.recfromimages import rec
 
+
 # 初始化 OCR 模型 (支持det检测和rec识别)
 
 
@@ -41,6 +42,7 @@ def detect_text_positions(cropped_images):
     for cropped in cropped_images:
         image = cropped['image']
         success, encoded_image = cv2.imencode('.png', image)
+        # png编码格式
         print(num)
         # 使用 det 模型检测文本位置
         result = detinstence.det_infer(encoded_image.tobytes())
@@ -49,9 +51,9 @@ def detect_text_positions(cropped_images):
             'index': cropped['index'],
             'polygon': cropped['polygon'],
             'detected_boxes': result,  # 文本位置框
-            'image': image  # 保留原始小图
+            'image': image  # 保留原始小图 opencv
         })
-        num+=1
+        num += 1
     return detected_results
 
 
@@ -64,7 +66,7 @@ def recognize_text(detected_results):
     for detected in detected_results:
         image = detected['image']
         recognized_texts = []
-        if detected['detected_boxes']==None:
+        if detected['detected_boxes'] == None:
             # recognition_results.append({
             #     'index': detected['index'],
             #     'polygon': detected['polygon'].tolist(),
@@ -74,11 +76,15 @@ def recognize_text(detected_results):
         reshaped_polygon = detected['polygon'].reshape((-1, 2))
         area = cv2.contourArea(reshaped_polygon)
         detected_area = cv2.contourArea(np.array(detected['detected_boxes']))
-        if detected_area<area/20:
+        if detected_area < area / 20:
+            success, encoded_image = cv2.imencode('.png', image)
+            prefix = "data:image/png;base64,"
+            image_base64 = base64.b64encode(encoded_image).decode('utf-8')
             recognition_results.append({
                 'index': detected['index'],
                 'polygon': detected['polygon'].tolist(),
-                'texts': '识别失败，当前单元格检测区域过小'
+                'texts': '识别失败，当前单元格检测区域过小',
+                'image': prefix + image_base64,
             })
             continue
         # box格式：[[[x1, y1], [x2, y2], [x3, y3], [x4, y4]], (score)]
@@ -100,17 +106,19 @@ def recognize_text(detected_results):
 
         # 使用 rec 模型识别文本内容
         rec_result = recinstence.rec_infer(encoded_image.tobytes())
-        if rec_result =="无有效内容":
+        if rec_result == "无有效内容":
             continue
 
         # 保存识别出的文本
         if rec_result and len(rec_result) > 0:
             recognized_texts.append(rec_result)  # 取出识别的文本内容
-
+        prefix = "data:image/png;base64,"
+        image_base64 = base64.b64encode(encoded_image).decode('utf-8')
         recognition_results.append({
             'index': detected['index'],
             'polygon': detected['polygon'].tolist(),
-            'texts': recognized_texts
+            'texts': recognized_texts,
+            'image': prefix + image_base64,
         })
 
     return recognition_results
