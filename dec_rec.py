@@ -103,7 +103,7 @@ def recognize_text(detected_results):
         x_max = np.max(poly[:, 0])
         y_max = np.max(poly[:, 1])
         cropped_text_area = cropped_text_area[y_min:y_max, x_min:x_max]
-        filepath = str(detected['index'])+'.png'
+        filepath = './temp/'+str(detected['index'])+'.png'
         cv2.imwrite(filepath,cropped_text_area)
         success, encoded_image = cv2.imencode('.png', cropped_text_area)
 
