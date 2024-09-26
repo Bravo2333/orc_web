@@ -94,7 +94,7 @@ def recognize_text(detected_results):
 
         # 创建用于裁剪的掩膜
         mask = np.zeros_like(image, dtype=np.uint8)
-        cv2.fillPoly(mask, [poly], (255, 255, 255))
+        cv2.fillPoly(mask, [poly], (0, 0, 0))
         print(detected['detected_boxes'])
         # 在原始小图片上裁剪出文本区域
         cropped_text_area = cv2.bitwise_and(image, mask)
@@ -103,8 +103,9 @@ def recognize_text(detected_results):
         x_max = np.max(poly[:, 0])
         y_max = np.max(poly[:, 1])
         cropped_text_area = cropped_text_area[y_min:y_max, x_min:x_max]
-        filepath = './temp/'+str(detected['index'])+'.png'
-        cv2.imwrite(filepath,cropped_text_area)
+        # 测试切割的最后图片
+        # filepath = './temp/'+str(detected['index'])+'.png'
+        # cv2.imwrite(filepath,cropped_text_area)
         success, encoded_image = cv2.imencode('.png', cropped_text_area)
 
         # 使用 rec 模型识别文本内容
@@ -142,14 +143,15 @@ def image_to_base64(image_path):
 # 示例主流程
 def getrec_result(image_path, polygons, output_text_path):
     # 读取图片
-    image = cv2.imread(image_path)
-    # for polygon in polygons:
-    #     points = np.array(polygon, dtype=np.int32).reshape(-1, 2)
-    #     # 在图片上绘制多边形，颜色为白色，线条宽度为3
-    #     cv2.polylines(tempimage, [points], isClosed=True, color=(255, 255, 255), thickness=3)
-    # success, encoded_image = cv2.imencode('.png', tempimage)
-    # cv2.imwrite('temp.png',encoded_image)
-    # image = cv2.imread('temp.png')
+    tempimage = cv2.imread(image_path)
+    for polygon in polygons:
+        points = np.array(polygon, dtype=np.int32).reshape(-1, 2)
+        # 在图片上绘制多边形，颜色为白色，线条宽度为3
+        cv2.polylines(tempimage, [points], isClosed=True, color=(255, 255, 255), thickness=3)
+    success, encoded_image = cv2.imencode('.png', tempimage)
+    # 保存无表格线的图片
+    cv2.imwrite('temp.png',encoded_image)
+    image = cv2.imread('temp.png')
     # 1. 使用多边形信息分割图片
     cropped_images = split_image_by_polygons(image, polygons)
     # num = 0
