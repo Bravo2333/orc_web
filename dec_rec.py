@@ -148,10 +148,8 @@ def getrec_result(image_path, polygons, output_text_path):
         points = np.array(polygon, dtype=np.int32).reshape(-1, 2)
         # 在图片上绘制多边形，颜色为白色，线条宽度为3
         cv2.polylines(tempimage, [points], isClosed=True, color=(255, 255, 255), thickness=3)
-    image_rgb = cv2.cvtColor(tempimage, cv2.COLOR_BGR2RGB)
-    success, encoded_image = cv2.imencode('.png', image_rgb)
+    cv2.imwrite('temp.png',tempimage)
     # 保存无表格线的图片
-    cv2.imwrite('temp.png',encoded_image)
     image = cv2.imread('temp.png')
     # 1. 使用多边形信息分割图片
     cropped_images = split_image_by_polygons(image, polygons)
