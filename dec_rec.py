@@ -103,6 +103,8 @@ def recognize_text(detected_results):
         x_max = np.max(poly[:, 0])
         y_max = np.max(poly[:, 1])
         cropped_text_area = cropped_text_area[y_min:y_max, x_min:x_max]
+        filepath = str(detected['index'])+'.png'
+        cv2.imwrite(filepath,cropped_text_area)
         success, encoded_image = cv2.imencode('.png', cropped_text_area)
 
         # 使用 rec 模型识别文本内容
@@ -150,15 +152,15 @@ def getrec_result(image_path, polygons, output_text_path):
     # image = cv2.imread('temp.png')
     # 1. 使用多边形信息分割图片
     cropped_images = split_image_by_polygons(image, polygons)
-    num = 0
-    for i in cropped_images:
-        success, encoded_image = cv2.imencode('.png', i['image'])
-        try:
-            cv2.imwrite('./temp/'+str(num)+'temp.png',encoded_image)
-            print('保存成功')
-        except:
-            print(str(num)+' 保存失败')
-        num+=1
+    # num = 0
+    # for i in cropped_images:
+    #     success, encoded_image = cv2.imencode('.png', i['image'])
+    #     try:
+    #         cv2.imwrite('./temp/'+str(num)+'temp.png',encoded_image)
+    #         print('保存成功')
+    #     except:
+    #         print(str(num)+' 保存失败')
+    #     num+=1
     # 2. 使用det模型检测小图片中的文本位置
     detected_results = detect_text_positions(cropped_images)
 
