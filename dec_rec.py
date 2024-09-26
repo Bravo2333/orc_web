@@ -140,11 +140,14 @@ def image_to_base64(image_path):
 # 示例主流程
 def getrec_result(image_path, polygons, output_text_path):
     # 读取图片
-    image = cv2.imread(image_path)
+    tempimage = cv2.imread(image_path)
     for polygon in polygons:
         points = np.array(polygon, dtype=np.int32).reshape(-1, 2)
         # 在图片上绘制多边形，颜色为白色，线条宽度为3
-        cv2.polylines(image, [points], isClosed=True, color=(255, 255, 255), thickness=3)
+        cv2.polylines(tempimage, [points], isClosed=True, color=(255, 255, 255), thickness=3)
+    success, encoded_image = cv2.imencode('.png', tempimage)
+    cv2.imwrite('temp.png',encoded_image)
+    image = cv2.imread('temp.png')
     # 1. 使用多边形信息分割图片
     cropped_images = split_image_by_polygons(image, polygons)
 
@@ -163,7 +166,7 @@ def getrec_result(image_path, polygons, output_text_path):
 # 测试用例
 if __name__ == '__main__':
     # 示例图片和多边形信息（实际的多边形信息应从外部提供）
-    image_path = 'table1_1.png'
+    image_path = 'C:\\Users\\Administrator\\Desktop\\49d521ba-c711-45c8-93c7-95b15b5e8d7d.png'
     output_text_path = 'recognized_texts.txt'
     base64_image = image_to_base64(image_path)
 
