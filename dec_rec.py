@@ -106,7 +106,7 @@ def recognize_text(detected_results):
 
         # 创建用于裁剪的掩膜
         mask = np.zeros_like(image, dtype=np.uint8)
-        cv2.fillPoly(mask, [poly], (0, 0, 0))
+        cv2.fillPoly(mask, [poly], (255, 255, 255))
         print(detected['detected_boxes'])
         # 在原始小图片上裁剪出文本区域
         cropped_text_area = cv2.bitwise_and(image, mask)
