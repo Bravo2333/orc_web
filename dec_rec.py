@@ -37,24 +37,25 @@ def detect_text_positions(cropped_images):
     detinstence = det()
     detinstence.det_init()
     detected_results = []
-    num = 1
+    num = 0
     for cropped in cropped_images:
         image = cropped['image']
+        cv2.imwrite('./temp/'+str(num)+'temp.png', image)
+
         # png编码格式
         success, encoded_image = cv2.imencode('.png', image)
         # image_base64 = base64.b64encode(encoded_image).decode('utf-8')
         # print(num,image_base64)
-        print(num)
         # 使用 det 模型检测文本位置
         result = detinstence.det_infer(encoded_image.tobytes())
-
+        print(num,result)
         detected_results.append({
             'index': cropped['index'],
             'polygon': cropped['polygon'],
             'detected_boxes': result,  # 文本位置框
             'image': image  # 保留原始小图 opencv
         })
-        num += 1
+        num+=1
     return detected_results
 
 
