@@ -155,6 +155,7 @@ def getrec_result(image_path, polygons, output_text_path):
         success, encoded_image = cv2.imencode('.png', i['image'])
         try:
             cv2.imwrite('temp/'+str(num)+'temp.png',encoded_image)
+            print('保存成功')
         except:
             print(str(num)+' 保存失败')
         num+=1
