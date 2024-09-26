@@ -41,8 +41,9 @@ def detect_text_positions(cropped_images):
     for cropped in cropped_images:
         image = cropped['image']
         success, encoded_image = cv2.imencode('.png', image)
+        image_base64 = base64.b64encode(encoded_image).decode('utf-8')
         # png编码格式
-        print(num)
+        print(num,image_base64)
         # 使用 det 模型检测文本位置
         result = detinstence.det_infer(encoded_image.tobytes())
 
