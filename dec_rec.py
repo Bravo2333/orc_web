@@ -22,7 +22,6 @@ def split_image_by_polygons(image, polygons):
         rect = cv2.boundingRect(polygon)
         x, y, w, h = rect
         cropped = image[y:y + h, x:x + w].copy()
-        print(cropped.shape)
         # 保存裁剪后的图片到列表
         cropped_images.append({
             'image': cropped,
@@ -40,7 +39,7 @@ def detect_text_positions(cropped_images):
     num = 0
     for cropped in cropped_images:
         image = cropped['image']
-        cv2.imwrite('./temp/'+str(num)+'temp.png', image)
+        # cv2.imwrite('./temp/'+str(num)+'temp.png', image)
 
         # png编码格式
         success, encoded_image = cv2.imencode('.png', image)
@@ -49,6 +48,15 @@ def detect_text_positions(cropped_images):
         # 使用 det 模型检测文本位置
         result = detinstence.det_infer(encoded_image.tobytes())
         print(num,result)
+
+        resultpolygon = np.array(result, dtype=np.float32)
+        resultpolygon = resultpolygon.reshape((-1, 2))
+        # 计算多边形的最小边界矩形，并裁剪图像
+        rect = cv2.boundingRect(resultpolygon)
+        x, y, w, h = rect
+        resultcropped = image[y:y + h, x:x + w].copy()
+        cv2.imwrite('./temp/'+str(num)+'temp.png',resultcropped)
+        
         detected_results.append({
             'index': cropped['index'],
             'polygon': cropped['polygon'],

@@ -83,13 +83,13 @@ filelist = []
 dataset_dir = '../dataset/g_test'  # 假设数据集文件夹
 output_rec_dir = './afterdet'
 inference_results_path = 'det_result.txt'  # 推理结果文件路径
-# train_data = load_data(os.path.join(dataset_dir, 'train.txt'))
-# val_data = load_data(os.path.join(dataset_dir, 'val.txt'))
-# for i in train_data:
-#     filelist.append(os.path.join(dataset_dir, i[0]))
-# for i in val_data:
-#     filelist.append(os.path.join(dataset_dir, i[0]))
-# print("开始检测")
+train_data = load_data(os.path.join(dataset_dir, 'train.txt'))
+val_data = load_data(os.path.join(dataset_dir, 'val.txt'))
+for i in train_data:
+    filelist.append(os.path.join(dataset_dir, i[0]))
+for i in val_data:
+    filelist.append(os.path.join(dataset_dir, i[0]))
+print("开始检测")
 detinstence = det()
 detinstence.det(detinstence.config, detinstence.logger, filelist)
 print("结束检测，开始切割")
