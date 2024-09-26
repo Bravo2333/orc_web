@@ -18,7 +18,6 @@ def split_image_by_polygons(image, polygons):
         # 提取多边形的坐标
         polygon = np.array(polygon, dtype=np.float32)
         polygon = polygon.reshape((-1, 2))
-        print(polygon)
         # 计算多边形的最小边界矩形，并裁剪图像
         rect = cv2.boundingRect(polygon)
         x, y, w, h = rect
@@ -140,10 +139,10 @@ def image_to_base64(image_path):
 def getrec_result(image_path, polygons, output_text_path):
     # 读取图片
     image = cv2.imread(image_path)
-    for polygon in polygons:
-        points = np.array(polygon, dtype=np.int32).reshape(-1, 2)
-        # 在图片上绘制多边形，颜色为蓝色，线条宽度为2
-        cv2.polylines(image, [points], isClosed=True, color=(255, 255, 255), thickness=3)
+    # for polygon in polygons:
+    #     points = np.array(polygon, dtype=np.int32).reshape(-1, 2)
+    #     # 在图片上绘制多边形，颜色为蓝色，线条宽度为2
+    #     cv2.polylines(image, [points], isClosed=True, color=(255, 255, 255), thickness=3)
     # 1. 使用多边形信息分割图片
     cropped_images = split_image_by_polygons(image, polygons)
 
