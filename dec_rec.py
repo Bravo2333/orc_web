@@ -47,6 +47,8 @@ def detect_text_positions(cropped_images):
         # print(num,image_base64)
         # 使用 det 模型检测文本位置
         result = detinstence.det_infer(encoded_image.tobytes())
+        if result is None:
+            continue
         print(num,result)
 
         resultpolygon = np.array(result, dtype=np.float32)
