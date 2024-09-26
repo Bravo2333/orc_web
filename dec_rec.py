@@ -56,7 +56,7 @@ def detect_text_positions(cropped_images):
         x, y, w, h = rect
         resultcropped = image[y:y + h, x:x + w].copy()
         cv2.imwrite('./temp/'+str(num)+'temp.png',resultcropped)
-        
+
         detected_results.append({
             'index': cropped['index'],
             'polygon': cropped['polygon'],
