@@ -22,7 +22,7 @@ def split_image_by_polygons(image, polygons):
         rect = cv2.boundingRect(polygon)
         x, y, w, h = rect
         cropped = image[y:y + h, x:x + w].copy()
-
+        print(cropped.shape)
         # 保存裁剪后的图片到列表
         cropped_images.append({
             'image': cropped,
@@ -40,10 +40,11 @@ def detect_text_positions(cropped_images):
     num = 1
     for cropped in cropped_images:
         image = cropped['image']
-        success, encoded_image = cv2.imencode('.png', image)
-        image_base64 = base64.b64encode(encoded_image).decode('utf-8')
         # png编码格式
-        print(num,image_base64)
+        success, encoded_image = cv2.imencode('.png', image)
+        # image_base64 = base64.b64encode(encoded_image).decode('utf-8')
+        # print(num,image_base64)
+        print(num)
         # 使用 det 模型检测文本位置
         result = detinstence.det_infer(encoded_image.tobytes())
 
@@ -140,10 +141,10 @@ def image_to_base64(image_path):
 def getrec_result(image_path, polygons, output_text_path):
     # 读取图片
     image = cv2.imread(image_path)
-    # for polygon in polygons:
-    #     points = np.array(polygon, dtype=np.int32).reshape(-1, 2)
-    #     # 在图片上绘制多边形，颜色为蓝色，线条宽度为2
-    #     cv2.polylines(image, [points], isClosed=True, color=(255, 255, 255), thickness=3)
+    for polygon in polygons:
+        points = np.array(polygon, dtype=np.int32).reshape(-1, 2)
+        # 在图片上绘制多边形，颜色为白色，线条宽度为3
+        cv2.polylines(image, [points], isClosed=True, color=(255, 255, 255), thickness=3)
     # 1. 使用多边形信息分割图片
     cropped_images = split_image_by_polygons(image, polygons)
 
