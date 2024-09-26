@@ -140,14 +140,14 @@ def image_to_base64(image_path):
 # 示例主流程
 def getrec_result(image_path, polygons, output_text_path):
     # 读取图片
-    tempimage = cv2.imread(image_path)
-    for polygon in polygons:
-        points = np.array(polygon, dtype=np.int32).reshape(-1, 2)
-        # 在图片上绘制多边形，颜色为白色，线条宽度为3
-        cv2.polylines(tempimage, [points], isClosed=True, color=(255, 255, 255), thickness=3)
-    success, encoded_image = cv2.imencode('.png', tempimage)
-    cv2.imwrite('temp.png',encoded_image)
-    image = cv2.imread('temp.png')
+    image = cv2.imread(image_path)
+    # for polygon in polygons:
+    #     points = np.array(polygon, dtype=np.int32).reshape(-1, 2)
+    #     # 在图片上绘制多边形，颜色为白色，线条宽度为3
+    #     cv2.polylines(tempimage, [points], isClosed=True, color=(255, 255, 255), thickness=3)
+    # success, encoded_image = cv2.imencode('.png', tempimage)
+    # cv2.imwrite('temp.png',encoded_image)
+    # image = cv2.imread('temp.png')
     # 1. 使用多边形信息分割图片
     cropped_images = split_image_by_polygons(image, polygons)
 
