@@ -50,7 +50,7 @@ def detect_text_positions(cropped_images):
         print(num,result)
 
         resultpolygon = np.array(result, dtype=np.float32)
-        resultpolygon = resultpolygon.reshape((-1, 2))
+        # resultpolygon = resultpolygon.reshape((-1, 2))
         # 计算多边形的最小边界矩形，并裁剪图像
         rect = cv2.boundingRect(resultpolygon)
         x, y, w, h = rect
