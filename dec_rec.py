@@ -150,7 +150,14 @@ def getrec_result(image_path, polygons, output_text_path):
     # image = cv2.imread('temp.png')
     # 1. 使用多边形信息分割图片
     cropped_images = split_image_by_polygons(image, polygons)
-
+    num = 0
+    for i in cropped_images:
+        success, encoded_image = cv2.imencode('.png', i['image'])
+        try:
+            cv2.imwrite('temp/'+str(num)+'temp.png',encoded_image)
+        except:
+            print(str(num)+' 保存失败')
+        num+=1
     # 2. 使用det模型检测小图片中的文本位置
     detected_results = detect_text_positions(cropped_images)
 
