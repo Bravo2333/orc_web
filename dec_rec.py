@@ -55,10 +55,10 @@ def detect_text_positions(cropped_images):
         print(resultpolygon.shape)
         # resultpolygon = resultpolygon.reshape((-1, 2))
         # 计算多边形的最小边界矩形，并裁剪图像
-        rect = cv2.boundingRect(resultpolygon)
-        x, y, w, h = rect
-        resultcropped = image[y:y + h, x:x + w].copy()
-        cv2.imwrite('./temp/'+str(num)+'temp.png',resultcropped)
+        # rect = cv2.boundingRect(resultpolygon)
+        # x, y, w, h = rect
+        # resultcropped = image[y:y + h, x:x + w].copy()
+        # cv2.imwrite('./temp/'+str(num)+'temp.png',resultcropped)
 
         detected_results.append({
             'index': cropped['index'],
