@@ -49,7 +49,7 @@ def detect_text_positions(cropped_images):
         result = detinstence.det_infer(encoded_image.tobytes())
         if result is None:
             continue
-        print(num,result)
+        # print(num, result)
 
         resultpolygon = np.array(result, dtype=np.float32)
         print(resultpolygon.shape)
@@ -66,7 +66,7 @@ def detect_text_positions(cropped_images):
             'detected_boxes': result,  # 文本位置框
             'image': image  # 保留原始小图 opencv
         })
-        num+=1
+        num += 1
     return detected_results
 
 
@@ -160,7 +160,7 @@ def getrec_result(image_path, polygons, output_text_path):
         points = np.array(polygon, dtype=np.int32).reshape(-1, 2)
         # 在图片上绘制多边形，颜色为白色，线条宽度为3
         cv2.polylines(tempimage, [points], isClosed=True, color=(255, 255, 255), thickness=3)
-    cv2.imwrite('temp.png',tempimage)
+    cv2.imwrite('temp.png', tempimage)
     # 保存无表格线的图片
     image = cv2.imread('temp.png')
     # 1. 使用多边形信息分割图片

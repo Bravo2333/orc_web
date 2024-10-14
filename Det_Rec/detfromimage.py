@@ -312,6 +312,7 @@ class det:
             if result[1] < area:
                 result[1] = area
                 result[0] = i
+        print(result[0])
         return result[0]['points']
         # return dt_boxes_json[0]['points']
         #         otstr = file + "\t" + json.dumps(dt_boxes_json) + "\n"
