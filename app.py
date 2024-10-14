@@ -16,6 +16,13 @@ UPLOAD_FOLDER = 'static'
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
+
+# 配置数据集存储路径
+DATASET_FOLDER = 'datasets'
+
+# 确保 datasets 文件夹存在
+if not os.path.exists(DATASET_FOLDER):
+    os.makedirs(DATASET_FOLDER)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 def image_to_base64(image_path):
@@ -48,6 +55,122 @@ def extract_base64_prefix(base64_string):
         base64_data = base64_string
 
     return prefix, base64_data
+
+
+
+
+# 创建数据集
+@app.route('/api/datasets/create', methods=['POST'])
+def create_dataset():
+    data = request.get_json()
+    dataset_name = data.get('name')
+
+    if not dataset_name:
+        return jsonify({"error": "数据集名称不能为空"}), 400
+
+    dataset_path = os.path.join(DATASET_FOLDER, dataset_name)
+    images_folder = os.path.join(dataset_path, 'images')
+
+    if os.path.exists(dataset_path):
+        return jsonify({"error": "数据集已存在"}), 400
+
+    # 创建数据集文件夹和 images 文件夹
+    os.makedirs(images_folder)
+
+    # 创建空的 annotations.txt 文件
+    annotation_file = os.path.join(dataset_path, 'annotations.txt')
+    with open(annotation_file, 'w') as f:
+        pass  # 创建空文件
+
+    return jsonify({"message": f"数据集 '{dataset_name}' 创建成功"}), 201
+
+
+# 获取数据集列表
+@app.route('/api/datasets', methods=['GET'])
+def get_datasets():
+    datasets = [d for d in os.listdir(DATASET_FOLDER) if os.path.isdir(os.path.join(DATASET_FOLDER, d))]
+    return jsonify(datasets), 200
+
+
+# 删除数据集
+@app.route('/api/datasets/delete', methods=['POST'])
+def delete_dataset():
+    data = request.get_json()
+    dataset_name = data.get('name')
+
+    dataset_path = os.path.join(DATASET_FOLDER, dataset_name)
+
+    if not os.path.exists(dataset_path):
+        return jsonify({"error": "数据集不存在"}), 400
+
+    # 删除整个数据集文件夹
+    os.system(f'rm -rf {dataset_path}')
+
+    return jsonify({"message": f"数据集 '{dataset_name}' 已删除"}), 200
+
+
+# 上传图片并自动化标注（模拟）
+@app.route('/api/annotate', methods=['POST'])
+def annotate_image():
+    dataset_name = request.json.get('dataset')
+    image_data = request.json.get('image')
+
+    if not dataset_name or not image_data:
+        return jsonify({"error": "数据集和图片数据不能为空"}), 400
+
+    dataset_path = os.path.join(DATASET_FOLDER, dataset_name)
+    images_folder = os.path.join(dataset_path, 'images')
+    annotation_file = os.path.join(dataset_path, 'annotations.txt')
+
+    if not os.path.exists(dataset_path):
+        return jsonify({"error": "数据集不存在"}), 400
+
+    # 模拟图片保存
+    image_id = len(os.listdir(images_folder)) + 1
+    image_path = os.path.join(images_folder, f'image{image_id}.png')
+
+    with open(image_path, 'wb') as f:
+        f.write(image_data.encode())  # 保存图片 (Base64解码可以使用base64模块)
+
+    # 模拟标注信息 (这是一个简单的例子，实际可以根据需求生成标注数据)
+    annotation_data = f"image{image_id}.png: 标注信息\n"
+
+    # 将标注信息追加到 annotations.txt 文件中
+    with open(annotation_file, 'a') as f:
+        f.write(annotation_data)
+
+    # 返回标注后的数据 (模拟)
+    annotated_image_data = image_data  # 实际上应该是带有标注的图片
+
+    return jsonify({
+        "originalImage": image_data,
+        "annotatedImage": annotated_image_data
+    }), 200
+
+
+# 获取数据集的标注信息
+@app.route('/api/datasets/<dataset_name>/annotations', methods=['GET'])
+def get_annotations(dataset_name):
+    dataset_path = os.path.join(DATASET_FOLDER, dataset_name)
+    annotation_file = os.path.join(dataset_path, 'annotations.txt')
+
+    if not os.path.exists(annotation_file):
+        return jsonify({"error": "数据集或标注信息不存在"}), 400
+
+    annotations = []
+    with open(annotation_file, 'r') as f:
+        for line in f.readlines():
+            annotations.append(line.strip())
+
+    return jsonify(annotations), 200
+
+
+# 提供图片访问服务
+@app.route('/datasets/<dataset_name>/images/<filename>', methods=['GET'])
+def get_image(dataset_name, filename):
+    images_folder = os.path.join(DATASET_FOLDER, dataset_name, 'images')
+    return send_from_directory(images_folder, filename)
+
 # API 接口: 处理图像识别请求
 @app.route('/api/recognize', methods=['POST'])
 def recognize_table():
