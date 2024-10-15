@@ -27,6 +27,7 @@ class CommonOcr(object):
             head['x-ti-app-id'] = self._app_id
             head['x-ti-secret-code'] = self._secret_code
             result = requests.post(url, data=image, headers=head)
+            print(result.text)
             for i in json.loads(result.text)["result"]["pages"][0]["tables"]:
                 if "table_cells" not in i.keys():
                     continue
