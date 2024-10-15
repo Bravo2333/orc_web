@@ -127,7 +127,7 @@ def annotate_image():
     # 调用 CommonOcr 进行 OCR 识别，获取标注信息
     ocr_engine = CommonOcr(original_image_path)  # 假设 CommonOcr 接受图片路径
     annotations = ocr_engine.recognize()  # 标注结果，例如：[["文字", 0, [x1, y1, x2, y2...], 置信度]]
-
+    print(annotations)
     # 使用 Pillow 处理 OCR 识别的标注信息并裁剪文字区域
     for i, annotation in enumerate(annotations):
         text = annotation[0]
