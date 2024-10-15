@@ -110,7 +110,7 @@ def annotate_image():
     dataset = Dataset.query.filter_by(name=dataset_name).first()
     if not dataset:
         return jsonify({"error": "数据集不存在"}), 400
-    print(image_data)
+    image_data = image_data.split(",")[1]
     # 解码并保存原始图片到 annotation.txt 同级目录下
     image_bytes = base64.b64decode(image_data)
     original_image = Image.open(BytesIO(image_bytes))
