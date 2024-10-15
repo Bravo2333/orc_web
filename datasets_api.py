@@ -7,6 +7,7 @@ from PIL import Image
 from io import BytesIO
 from data_annotation.textin import CommonOcr
 import os
+from app import db
 # 配置数据集存储路径
 DATASET_FOLDER = 'datasets'
 
@@ -17,7 +18,7 @@ if not os.path.exists(DATASET_FOLDER):
 datasets_api = Blueprint('datasets_api', __name__)
 
 # 初始化 SQLAlchemy，注意这里 db 可能需要从 app.py 引入
-db = SQLAlchemy()
+# db = SQLAlchemy()
 
 # 数据集表
 class Dataset(db.Model):
