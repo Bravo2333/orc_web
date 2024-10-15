@@ -1,6 +1,7 @@
 import base64
 
 from flask import Blueprint, request, jsonify
+from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from PIL import Image
@@ -16,7 +17,7 @@ if not os.path.exists(DATASET_FOLDER):
     os.makedirs(DATASET_FOLDER)
 # 创建蓝图
 datasets_api = Blueprint('datasets_api', __name__)
-
+CORS(datasets_api)
 # 初始化 SQLAlchemy，注意这里 db 可能需要从 app.py 引入
 # db = SQLAlchemy()
 
