@@ -1,5 +1,4 @@
 import re
-from flask_sqlalchemy import SQLAlchemy
 import cv2
 import requests
 from flask import Flask, request, jsonify, send_from_directory
@@ -10,7 +9,7 @@ from dec_rec import getrec_result
 from flask_cors import CORS
 import uuid
 from datasets_api import datasets_api
-
+from extensions import db
 app = Flask(__name__)
 CORS(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:root2333@8.130.54.57/ocr_dataset'
@@ -20,12 +19,8 @@ UPLOAD_FOLDER = 'static'
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
-# 初始化 SQLAlchemy
-db = SQLAlchemy(app)
-
 # 注册蓝图，使用 /datasets 作为前缀
 app.register_blueprint(datasets_api, url_prefix='/datasets')
-
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 @app.route('/datasets/<dataset_name>/images/<filename>')
 def serve_image(dataset_name, filename):
@@ -117,4 +112,6 @@ def static_files(filename):
 
 
 if __name__ == '__main__':
+    db.init_app(app)
+    # 初始化 SQLAlchemy
     app.run(debug=True,port=3000)

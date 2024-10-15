@@ -7,7 +7,7 @@ from PIL import Image
 from io import BytesIO
 from data_annotation.textin import CommonOcr
 import os
-from app import db
+from extensions import db
 # 配置数据集存储路径
 DATASET_FOLDER = 'datasets'
 
