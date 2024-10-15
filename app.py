@@ -19,8 +19,8 @@ UPLOAD_FOLDER = 'static'
 if not os.path.exists(UPLOAD_FOLDER):
     os.makedirs(UPLOAD_FOLDER)
 
-# 注册蓝图，使用 /datasets 作为前缀
-app.register_blueprint(datasets_api, url_prefix='/datasets')
+# 注册蓝图，使用 /dataset 作为前缀
+app.register_blueprint(datasets_api, url_prefix='/dataset')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 def image_to_base64(image_path):
     with open(image_path, "rb") as image_file:
@@ -52,7 +52,10 @@ def extract_base64_prefix(base64_string):
         base64_data = base64_string
 
     return prefix, base64_data
-
+@app.route('/datasets/<dataset_name>/images/<filename>')
+def serve_image(dataset_name, filename):
+    image_dir = os.path.join("./datasets/", dataset_name, 'images/')
+    return send_from_directory(image_dir, filename)
 # API 接口: 处理图像识别请求
 @app.route('/api/recognize', methods=['POST'])
 def recognize_table():
