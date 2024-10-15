@@ -45,7 +45,7 @@ class Data(db.Model):
 
 
 # 创建数据集
-@datasets_api.route('/datasets/create', methods=['POST'])
+@datasets_api.route('/create', methods=['POST'])
 def create_dataset():
     data = request.get_json()
     dataset_name = data.get('name')
@@ -77,7 +77,7 @@ def get_datasets():
 
 
 # 删除数据集
-@datasets_api.route('/datasets/delete', methods=['POST'])
+@datasets_api.route('/delete', methods=['POST'])
 def delete_dataset():
     data = request.get_json()
     dataset_name = data.get('name')
@@ -177,7 +177,7 @@ def annotate_image():
 
 
 # 获取某个数据集的标注信息
-@datasets_api.route('/datasets/<int:dataset_id>/annotations', methods=['GET'])
+@datasets_api.route('/<int:dataset_id>/annotations', methods=['GET'])
 def get_annotations(dataset_id):
     data_entries = Data.query.filter_by(dataset_id=dataset_id).all()
     response = [{
