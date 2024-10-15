@@ -45,6 +45,7 @@ class Data(db.Model):
 @datasets_api.route('/datasets/<dataset_name>/images/<filename>')
 def serve_image(dataset_name, filename):
     image_dir = os.path.join("./datasets/", dataset_name, 'images')
+    print(image_dir)
     return send_from_directory(image_dir, filename)
 # 创建数据集
 @datasets_api.route('/create', methods=['POST'])
