@@ -1,6 +1,6 @@
 import base64
 
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, send_from_directory
 from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
@@ -20,7 +20,6 @@ datasets_api = Blueprint('datasets_api', __name__)
 CORS(datasets_api)
 # 初始化 SQLAlchemy，注意这里 db 可能需要从 app.py 引入
 # db = SQLAlchemy()
-
 # 数据集表
 class Dataset(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -43,7 +42,10 @@ class Data(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
 
-
+@datasets_api.route('/datasets/<dataset_name>/images/<filename>')
+def serve_image(dataset_name, filename):
+    image_dir = os.path.join("./datasets/", dataset_name, 'images')
+    return send_from_directory(image_dir, filename)
 # 创建数据集
 @datasets_api.route('/create', methods=['POST'])
 def create_dataset():
