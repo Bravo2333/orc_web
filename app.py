@@ -10,6 +10,7 @@ from flask_cors import CORS
 import uuid
 from datasets_api import datasets_api
 from extensions import db
+
 app = Flask(__name__)
 CORS(app)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:root2333@8.130.54.57/ocr_dataset'
@@ -22,9 +23,13 @@ if not os.path.exists(UPLOAD_FOLDER):
 # 注册蓝图，使用 /dataset 作为前缀
 app.register_blueprint(datasets_api, url_prefix='/dataset')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
+
 def image_to_base64(image_path):
     with open(image_path, "rb") as image_file:
         return base64.b64encode(image_file.read()).decode('utf-8')
+
+
 # 模拟表格识别处理函数
 
 def base64_to_image(base64_str):
@@ -52,14 +57,20 @@ def extract_base64_prefix(base64_string):
         base64_data = base64_string
 
     return prefix, base64_data
+
+
 @app.route('/datasets/<dataset_name>/images/<filename>')
 def serve_image(dataset_name, filename):
     image_dir = os.path.join("./datasets/", dataset_name, 'images/')
     return send_from_directory(image_dir, filename)
-@app.route('/images/<filename>')
-def padding_image(filename):
-    image_dir = os.path.join("./", filename)
+
+
+@app.route('/images/<dataset_name>/<filename>')
+def padding_image(dataset_name, filename):
+    image_dir = os.path.join("./datasets", dataset_name, "/images",filename)
     return send_from_directory(image_dir)
+
+
 # API 接口: 处理图像识别请求
 @app.route('/api/recognize', methods=['POST'])
 def recognize_table():
@@ -67,7 +78,7 @@ def recognize_table():
     base64_image = data.get('image')
     random_filename = f"{uuid.uuid4()}.png"
 
-    prefix,base64_image = extract_base64_prefix(base64_image)
+    prefix, base64_image = extract_base64_prefix(base64_image)
     image_path = os.path.join(app.config['UPLOAD_FOLDER'], random_filename)
     image_data = base64.b64decode(base64_image)
     print(image_path)
@@ -89,7 +100,7 @@ def recognize_table():
         # 发送POST请求到Flask服务
         response = requests.post('http://127.0.0.1:5000/api/recognize', json=payload)
         data = response.json()
-        base64_result_image = prefix+data['image_base64']
+        base64_result_image = prefix + data['image_base64']
         # 假设有两个多边形，4个点定义一个多边形
         polygons_list = data['polygons']
         print(polygons_list)
@@ -99,7 +110,7 @@ def recognize_table():
         # 执行主流程
         recognition_results = getrec_result(image_path, polygons, output_text_path)
         # 处理图片，模拟表格识别并返回结果
-        result ={}
+        result = {}
         result['base64'] = base64_result_image
         result['recognition_results'] = recognition_results
         print(type(result))
@@ -120,4 +131,4 @@ if __name__ == '__main__':
     with app.app_context():
         db.create_all()  # 自动创建表
     # 初始化 SQLAlchemy
-    app.run(debug=True,port=3000)
+    app.run(debug=True, port=3000)
