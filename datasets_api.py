@@ -208,12 +208,10 @@ def get_annotations(dataset_name):
 @datasets_api.route('/annotations_filter_by_imagename/', methods=['post'])
 def get_annotations_filter_by_imagename():
     data = request.json
-    print(data['imagename'],data['datasetName'])
     image_name = data['imagename']
     image_name = image_name.split('.')[0]
     dataset = Dataset.query.filter_by(name = data['datasetName']).first()
     dataset_id = dataset.id
-    print(dataset_id)
     data_entries = Data.query.filter_by(dataset_id=dataset_id).all()
     response = [{
         "image_path": d.image_path.split('/')[-1],
@@ -222,8 +220,7 @@ def get_annotations_filter_by_imagename():
     } for d in data_entries]
     result = []
     for i in response:
-        print(image_name,i['image_path'])
-        if image_name in i['image_path']:
+        if image_name[9:] in i['image_path']:
             result.append(i)
     return jsonify(result), 200
 
