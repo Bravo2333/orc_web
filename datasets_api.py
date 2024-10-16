@@ -216,7 +216,7 @@ def get_annotations_filter_by_imagename():
     response = [{
         "image_path": d.image_path.split('/')[-1],
         "annotation": d.text,
-        "created_at": d.created_at
+        "confidence": d.confidence
     } for d in data_entries]
     result = []
     for i in response:
