@@ -56,10 +56,10 @@ def extract_base64_prefix(base64_string):
 def serve_image(dataset_name, filename):
     image_dir = os.path.join("./datasets/", dataset_name, 'images/')
     return send_from_directory(image_dir, filename)
-@app.route('/images/<dataset_name>/<filename>')
-def padding_image(dataset_name, filename):
-    image_dir = os.path.join("./datasets/", dataset_name)
-    return send_from_directory(image_dir, filename)
+@app.route('/images/<filename>')
+def padding_image(filename):
+    image_dir = os.path.join("./", filename)
+    return send_from_directory(image_dir)
 # API 接口: 处理图像识别请求
 @app.route('/api/recognize', methods=['POST'])
 def recognize_table():
