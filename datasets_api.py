@@ -41,8 +41,27 @@ class Data(db.Model):
     confidence = db.Column(db.Float, nullable=False)  # 置信度
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
+@datasets_api.route('/datasets/pending_images/<dataset_name>', methods=['GET'])
+def get_pending_images(dataset_name):
+    dataset = Dataset.query.filter_by(name=dataset_name).first()
+    if not dataset:
+        return jsonify({"error": "Dataset not found"}), 404
 
+    # 获取数据集对应的文件夹路径
+    dataset_folder = dataset.path
 
+    # 检查文件夹是否存在
+    if not os.path.exists(dataset_folder):
+        return jsonify({"error": "Dataset folder not found"}), 404
+
+    # 列出该文件夹中的所有图片文件（假设图片格式为 .png 或 .jpg）
+    images = [f for f in os.listdir(dataset_folder) if f.endswith(('.png', '.jpg'))]
+
+    # 构建完整的图片路径 (可选)
+    image_paths = [os.path.join(dataset_folder, image) for image in images]
+
+    # 返回图片文件名列表或完整路径列表给前端
+    return jsonify(image_paths), 200
 # 创建数据集
 @datasets_api.route('/create', methods=['POST'])
 def create_dataset():
@@ -186,6 +205,26 @@ def get_annotations(dataset_name):
         "created_at": d.created_at
     } for d in data_entries]
     return jsonify(response), 200
+@datasets_api.route('/annotations_filter_by_imagename/${datasetName}', methods=['GET'])
+def get_annotations_filter_by_imagename(dataset_name):
+    data = request.json
+    image_name = data['imageName']
+    image_name = image_name.split('.')[0]
+    dataset = Dataset.query.filter_by(name = dataset_name).first()
+    dataset_id = dataset.id
+    data_entries = Data.query.filter_by(dataset_id=dataset_id).all()
+    response = [{
+        "image_path": d.image_path,
+        "annotation": d.text,
+        "created_at": d.created_at
+    } for d in data_entries]
+    result = []
+    for i in response:
+        if image_name in i['image_path']:
+            result.append(i)
+    return jsonify(result), 200
+
+
 @datasets_api.route('/delete_annotations', methods=['POST'])
 def delete_annotations():
     data = request.get_json()
