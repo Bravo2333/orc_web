@@ -175,7 +175,7 @@ def annotate_image():
 
 
 # 获取某个数据集的标注信息
-@datasets_api.route('/annotations/<str:dataset_name>', methods=['GET'])
+@datasets_api.route('/annotations/<dataset_name>', methods=['GET'])
 def get_annotations(dataset_name):
     dataset = Dataset.query.filter_by(name = dataset_name).first()
     dataset_id = dataset.id
