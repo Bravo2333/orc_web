@@ -182,7 +182,7 @@ def get_annotations(dataset_name):
     data_entries = Data.query.filter_by(dataset_id=dataset_id).all()
     response = [{
         "image_path": d.image_path,
-        "annotation": d.annotation,
+        "annotation": d.text,
         "created_at": d.created_at
     } for d in data_entries]
     return jsonify(response), 200
