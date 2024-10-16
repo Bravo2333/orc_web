@@ -67,8 +67,8 @@ def serve_image(dataset_name, filename):
 
 @app.route('/images/<dataset_name>/<filename>')
 def padding_image(dataset_name, filename):
-    image_dir = os.path.join(dataset_name, "/images",filename)
-    return send_from_directory("./datasets",image_dir)
+    image_dir = os.path.join("./datasets", dataset_name)
+    return send_from_directory(image_dir,filename)
 
 
 # API 接口: 处理图像识别请求
