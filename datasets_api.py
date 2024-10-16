@@ -58,10 +58,10 @@ def get_pending_images(dataset_name):
     images = [f for f in os.listdir(dataset_folder) if f.endswith(('.png', '.jpg'))]
 
     # 构建完整的图片路径 (可选)
-    image_paths = [os.path.join(dataset_folder, image) for image in images]
+    # image_paths = [os.path.join(dataset_folder, image) for image in images]
 
     # 返回图片文件名列表或完整路径列表给前端
-    return jsonify(image_paths), 200
+    return jsonify(images), 200
 # 创建数据集
 @datasets_api.route('/create', methods=['POST'])
 def create_dataset():
