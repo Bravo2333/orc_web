@@ -175,15 +175,16 @@ def annotate_image():
 
 
 # 获取某个数据集的标注信息
-@datasets_api.route('/<int:dataset_id>/annotations', methods=['GET'])
-def get_annotations(dataset_id):
+@datasets_api.route('/annotations/<str:dataset_name>', methods=['GET'])
+def get_annotations(dataset_name):
+    dataset = Dataset.query.filter_by(name = dataset_name).first()
+    dataset_id = dataset.id
     data_entries = Data.query.filter_by(dataset_id=dataset_id).all()
     response = [{
         "image_path": d.image_path,
         "annotation": d.annotation,
         "created_at": d.created_at
     } for d in data_entries]
-
     return jsonify(response), 200
 @datasets_api.route('/delete_annotations', methods=['POST'])
 def delete_annotations():
@@ -203,3 +204,34 @@ def delete_annotations():
     db.session.commit()
 
     return jsonify({"message": "删除成功"}), 200
+
+@datasets_api.route('/datasets/delete_image/<dataset_name>', methods=['POST'])
+def delete_image(dataset_name):
+    data = request.get_json()
+    image_id = data.get('imageId')
+
+    if not image_id:
+        return jsonify({"error": "Missing imageId"}), 400
+
+    # 构建图片文件的路径（这里假设图片存储在特定的文件夹中）
+    image_folder = os.path.join("./datasets", dataset_name)
+    image_path = os.path.join(image_folder, f'image_{image_id}.png')
+
+    # 删除图片文件
+    if os.path.exists(image_path):
+        os.remove(image_path)
+    else:
+        return jsonify({"error": "Image not found"}), 404
+
+    # 删除相关的标注数据（假设标注数据存储在数据库或文本文件中）
+    annotations_file = os.path.join("./datasets", dataset_name, 'annotations.txt')
+
+    # 示例：从文本文件中删除与该图片相关的标注条目
+    with open(annotations_file, 'r') as file:
+        lines = file.readlines()
+    with open(annotations_file, 'w') as file:
+        for line in lines:
+            if f'image_{image_id}' not in line:
+                file.write(line)
+
+    return jsonify({"success": True}), 200
