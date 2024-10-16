@@ -41,7 +41,7 @@ class Data(db.Model):
     confidence = db.Column(db.Float, nullable=False)  # 置信度
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
-@datasets_api.route('/datasets/pending_images/<dataset_name>', methods=['GET'])
+@datasets_api.route('/pending_images/<dataset_name>', methods=['GET'])
 def get_pending_images(dataset_name):
     dataset = Dataset.query.filter_by(name=dataset_name).first()
     if not dataset:
