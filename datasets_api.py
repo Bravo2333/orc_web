@@ -214,7 +214,7 @@ def get_annotations_filter_by_imagename(dataset_name):
     dataset_id = dataset.id
     data_entries = Data.query.filter_by(dataset_id=dataset_id).all()
     response = [{
-        "image_path": d.image_path,
+        "image_path": d.image_path.split('/')[-1],
         "annotation": d.text,
         "created_at": d.created_at
     } for d in data_entries]
