@@ -205,7 +205,7 @@ def get_annotations(dataset_name):
         "created_at": d.created_at
     } for d in data_entries]
     return jsonify(response), 200
-@datasets_api.route('/annotations_filter_by_imagename/${datasetName}', methods=['GET'])
+@datasets_api.route('/annotations_filter_by_imagename/${datasetName}', methods=['post'])
 def get_annotations_filter_by_imagename(dataset_name):
     data = request.json
     image_name = data['imageName']
