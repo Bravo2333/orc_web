@@ -83,7 +83,7 @@ def process_annotations(dataset_name, original_image_path, matched_annotations):
             if not intersection_points:
                 continue
 
-            img_filename = f"img_{original_image_path.split('/')[-1]}_{img_count}.jpg"
+            img_filename = f"img_{original_image_path.split('/')[-1].split('.')[0]}_{img_count}.jpg"
             image_save_path = os.path.join(images_folder, img_filename)
 
             # 切割并保存图片
