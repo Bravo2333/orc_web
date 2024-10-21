@@ -115,7 +115,7 @@ def recognize_and_process():
 
     # 获取数据库中的标注信息
     image_name = image_name.split('.')[0]
-    dataset = Dataset.query.filter_by(name=data['datasetName']).first()
+    dataset = Dataset.query.filter_by(name=dataset_name).first()
     dataset_id = dataset.id
     data_entries = Data.query.filter_by(dataset_id=dataset_id).all()
     result = []
