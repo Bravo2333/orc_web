@@ -135,10 +135,13 @@ def recognize_and_process():
         for polygon in polygons:
             polygon_coords = [(polygon[i], polygon[i + 1]) for i in range(0, len(polygon), 2)]
             if Polygon(polygon_coords).contains(Point(centroid)):
+                coords_list = [float(c) for c in annotation.coordinates.split(',')]
+                points = [(coords_list[i], coords_list[i + 1]) for i in range(0, len(coords_list), 2)]
                 matched_annotations.append({
                     'text': annotation.text,
                     'polygon': polygon_coords,
-                    'points': [(float(p[0]), float(p[1])) for p in Polygon(annotation.coordinates).exterior.coords]
+
+                    'points': points
                     # 标注多边形
                 })
                 break
