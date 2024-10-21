@@ -55,42 +55,6 @@ def load_model(config, model, optimizer=None, model_type="det"):
     pretrained_model = global_config.get("pretrained_model")
     best_model_dict = {}
     is_float16 = False
-    is_nlp_model = model_type == "kie" and config["Architecture"]["algorithm"] not in [
-        "SDMGR"
-    ]
-
-    if is_nlp_model is True:
-        # NOTE: for kie model dsitillation, resume training is not supported now
-        if config["Architecture"]["algorithm"] in ["Distillation"]:
-            return best_model_dict
-        checkpoints = config["Architecture"]["Backbone"]["checkpoints"]
-        # load kie method metric
-        if checkpoints:
-            if os.path.exists(os.path.join(checkpoints, "metric.states")):
-                with open(os.path.join(checkpoints, "metric.states"), "rb") as f:
-                    states_dict = (
-                        pickle.load(f) if six.PY2 else pickle.load(f, encoding="latin1")
-                    )
-                best_model_dict = states_dict.get("best_model_dict", {})
-                if "epoch" in states_dict:
-                    best_model_dict["start_epoch"] = states_dict["epoch"] + 1
-            logger.info("resume from {}".format(checkpoints))
-
-            if optimizer is not None:
-                if checkpoints[-1] in ["/", "\\"]:
-                    checkpoints = checkpoints[:-1]
-                if os.path.exists(checkpoints + ".pdopt"):
-                    optim_dict = paddle.load(checkpoints + ".pdopt")
-                    optimizer.set_state_dict(optim_dict)
-                else:
-                    logger.warning(
-                        "{}.pdopt is not exists, params of optimizer is not loaded".format(
-                            checkpoints
-                        )
-                    )
-
-        return best_model_dict
-
     if checkpoints:
         if checkpoints.endswith(".pdparams"):
             checkpoints = checkpoints.replace(".pdparams", "")
@@ -158,11 +122,11 @@ def load_model(config, model, optimizer=None, model_type="det"):
 def load_pretrained_params(model, path):
     logger = get_logger()
     path = maybe_download_params(path)
-    if path.endswith(".pdparams"):
-        path = path.replace(".pdparams", "")
-    assert os.path.exists(
-        path + ".pdparams"
-    ), "The {}.pdparams does not exists!".format(path)
+    # if path.endswith(".pdparams"):
+    #     path = path.replace(".pdparams", "")
+    # assert os.path.exists(
+    #     path + ".pdparams"
+    # ), "The {}.pdparams does not exists!".format(path)
 
     params = paddle.load(path + ".pdparams")
 

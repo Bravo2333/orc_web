@@ -276,7 +276,6 @@ class det:
     def det_infer(self, img):
         data = {"image": img}
         batch = transform(data, self.ops)
-
         images = np.expand_dims(batch[0], axis=0)
         shape_list = np.expand_dims(batch[1], axis=0)
         images = paddle.to_tensor(images)

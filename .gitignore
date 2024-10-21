@@ -8,6 +8,7 @@ out
 gen
 # model files
 !/Det_Rec/best_model/
+!/Det_Rec/text_detection_module
 Det_Rec/best_model/best_det/best_accuracy.pdopt
 Det_Rec/best_model/best_det/best_accuracy.pdparams
 Det_Rec/best_model/best_det/best_accuracy.states
@@ -17,3 +18,9 @@ Det_Rec/best_model/best_rec/best_accuracy.pdopt
 Det_Rec/best_model/best_rec/best_accuracy.states
 Det_Rec/best_model/best_rec/config.yaml
 Det_Rec/__pycache__
+/Det_Rec/text_detection_module/best_accuracy.pdiparams
+/Det_Rec/text_detection_module/best_accuracy.pdiparams.info
+/Det_Rec/text_detection_module/best_accuracy.pdmodel
+/Det_Rec/text_detection_module/inference.pdiparams
+/Det_Rec/text_detection_module/inference.pdiparams.info
+/Det_Rec/text_detection_module/inference.pdmodel
