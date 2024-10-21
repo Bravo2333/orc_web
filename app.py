@@ -9,6 +9,7 @@ from dec_rec import getrec_result
 from flask_cors import CORS
 import uuid
 from datasets_api import datasets_api
+from solve_data_api import solve_data_api
 from extensions import db
 
 app = Flask(__name__)
@@ -22,6 +23,7 @@ if not os.path.exists(UPLOAD_FOLDER):
 
 # 注册蓝图，使用 /dataset 作为前缀
 app.register_blueprint(datasets_api, url_prefix='/dataset')
+app.register_blueprint(solve_data_api, url_prefix='/solve')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
