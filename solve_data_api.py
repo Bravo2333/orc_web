@@ -53,10 +53,18 @@ def calculate_intersection(poly1, poly2):
 # 切割图片并保存
 def save_cropped_image(original_image_path, polygon_coords, image_save_path):
     image = Image.open(original_image_path)
+
+    # 获取多边形的最小边界框并切割图片
     polygon = Polygon(polygon_coords)
-    bounds = polygon.bounds  # 获取多边形的最小边界框
+    bounds = polygon.bounds  # 获取多边形的最小边界框 (x_min, y_min, x_max, y_max)
     cropped_image = image.crop(bounds)
-    cropped_image.save(image_save_path)
+
+    # 如果图片是 RGBA 模式，将其转换为 RGB 模式
+    if cropped_image.mode == 'RGBA':
+        cropped_image = cropped_image.convert('RGB')
+
+    # 保存图片为 JPEG 格式
+    cropped_image.save(image_save_path, format='JPEG')
 
 
 # 主函数：处理标注数据，生成新的数据集
