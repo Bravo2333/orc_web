@@ -164,6 +164,7 @@ def process_annotations(dataset_name, original_image_path, matched_annotations):
             detected_polygon = annotation['polygon']  # 识别的多边形
 
             intersection_points = calculate_intersection(text_polygon, detected_polygon)
+            print(intersection_points)
             if not intersection_points:
                 continue
 
