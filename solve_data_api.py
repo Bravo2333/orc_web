@@ -41,13 +41,67 @@ def calculate_centroid(coordinates_str):
 
 
 # 计算多边形交集
+def calculate_area(points):
+    polygon = Polygon(points)
+    return polygon.area
+
+
+# 计算多边形交集，并保留 poly2 中的边，凑够 4 个点，选择 poly1 中能最大化面积的点
 def calculate_intersection(poly1, poly2):
     polygon1 = Polygon(poly1)
     polygon2 = Polygon(poly2)
+
+    # 计算多边形交集
     intersection = polygon1.intersection(polygon2)
+
+    # 如果交集为空，返回 None
     if intersection.is_empty:
         return None
-    return list(intersection.exterior.coords)
+
+    # 获取交集的坐标
+    intersection_coords = list(intersection.exterior.coords)
+
+    # 如果交集的点数小于 5，则不需要处理
+    if len(intersection_coords) < 5:
+        return intersection_coords
+
+    # 保留属于 poly2 的边
+    poly2_coords = list(polygon2.exterior.coords)
+    common_coords = []
+
+    # 找出交集中属于 poly2 的点
+    for point in intersection_coords:
+        if point in poly2_coords:
+            common_coords.append(point)
+
+    # 如果保留的点数少于 4 个，则需要从 poly1 中补充点
+    if len(common_coords) < 4:
+        additional_points_needed = 4 - len(common_coords)
+
+        # 获取 poly1 中的点并将其转换为 numpy 数组，以方便操作
+        poly1_coords = np.array(list(polygon1.exterior.coords))
+
+        # 按照面积最大化选择点
+        for _ in range(additional_points_needed):
+            best_point = None
+            best_area = 0
+
+            for point in poly1_coords:
+                if tuple(point) not in common_coords:
+                    # 计算加入该点后多边形的面积
+                    test_polygon = common_coords + [tuple(point)]
+                    area = calculate_area(test_polygon)
+
+                    # 选择能让面积最大的点
+                    if area > best_area:
+                        best_point = tuple(point)
+                        best_area = area
+
+            if best_point:
+                common_coords.append(best_point)
+
+    # 返回最终的 4 个点的多边形
+    return common_coords[:4]
 
 
 # 切割图片并保存
