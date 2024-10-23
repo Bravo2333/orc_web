@@ -42,7 +42,7 @@ def calculate_centroid(coordinates_str):
 
 
 # 计算多边形交集，并保留 poly2 中的边，凑够 4 个点，选择 poly1 中能最大化面积的点
-def calculate_intersection_in_pixels(poly1, poly2):
+def calculate_intersection(poly1, poly2):
     # 创建 Polygon 对象
     polygon1 = Polygon(poly1)
     polygon2 = Polygon(poly2)
