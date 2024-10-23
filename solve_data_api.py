@@ -67,6 +67,18 @@ def save_cropped_image(original_image_path, polygon_coords, image_save_path):
     cropped_image.save(image_save_path, format='JPEG')
 
 
+def convert_to_relative_pixel_position(detected_polygon, intersection_points):
+    """
+    将 intersection_points 转换为相对于 detected_polygon 的相对像素位置
+    """
+    # 以 detected_polygon 的第一个点为参考点（左上角）
+    reference_point = detected_polygon[0]
+
+    # 对每个 intersection_point 进行坐标变换
+    relative_points = [[point[0] - reference_point[0], point[1] - reference_point[1]] for point in intersection_points]
+
+    return relative_points
+
 # 主函数：处理标注数据，生成新的数据集
 def process_annotations(dataset_name, original_image_path, matched_annotations):
     images_folder, label_file_path = create_dataset_folders(dataset_name)
@@ -91,7 +103,7 @@ def process_annotations(dataset_name, original_image_path, matched_annotations):
 
             annotation_data = {
                 "transcription": annotation['text'],
-                "points": intersection_points
+                "points": convert_to_relative_pixel_position(detected_polygon, intersection_points)
             }
 
             label_entry = f"images/{img_filename}\t[{json.dumps(annotation_data)}]\n"
