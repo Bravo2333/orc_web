@@ -41,14 +41,9 @@ def calculate_centroid(coordinates_str):
     return centroid_x, centroid_y
 
 
-# 计算多边形交集
-def calculate_area(points):
-    polygon = Polygon(points)
-    return polygon.area
-
-
 # 计算多边形交集，并保留 poly2 中的边，凑够 4 个点，选择 poly1 中能最大化面积的点
-def calculate_intersection(poly1, poly2):
+def calculate_intersection_in_pixels(poly1, poly2):
+    # 创建 Polygon 对象
     polygon1 = Polygon(poly1)
     polygon2 = Polygon(poly2)
 
@@ -59,67 +54,14 @@ def calculate_intersection(poly1, poly2):
     if intersection.is_empty:
         return None
 
-    # 获取交集的坐标
-    intersection_coords = list(intersection.exterior.coords)
+    # 获取交集的最小外接矩形，确保用 4 个点框住
+    intersection_rectangle = intersection.minimum_rotated_rectangle
+    intersection_coords = list(intersection_rectangle.exterior.coords)[:4]  # 保留 4 个点
 
-    # 如果交集的点数小于 5，则不需要处理
-    if len(intersection_coords) < 5:
-        return intersection_coords
+    # 将坐标转换为整数像素坐标
+    pixel_coords = [(int(coord[0]), int(coord[1])) for coord in intersection_coords]
 
-    # 保留属于 poly2 的边
-    poly2_coords = list(polygon2.exterior.coords)
-    common_coords = []
-
-    # 找出交集中属于 poly2 的点
-    for point in intersection_coords:
-        if point in poly2_coords:
-            common_coords.append(point)
-
-    # 如果保留的点数少于 4 个，则需要从 poly1 中补充点
-    additional_points_needed = 4 - len(common_coords)
-
-    # 获取 poly1 中的点并将其转换为 numpy 数组，以方便操作
-    poly1_coords = np.array(list(polygon1.exterior.coords))
-
-    # 如果需要补充 1 个点
-    if additional_points_needed == 1:
-        best_point = None
-        best_area = 0
-        for point in poly1_coords:
-            if tuple(point) not in common_coords:
-                # 计算加入该点后多边形的面积
-                test_polygon = common_coords + [tuple(point)]
-                area = calculate_area(test_polygon)
-
-                # 选择能让面积最大的点
-                if area > best_area:
-                    best_point = tuple(point)
-                    best_area = area
-
-        if best_point:
-            common_coords.append(best_point)
-
-    # 如果需要补充 2 个点
-    elif additional_points_needed == 2:
-        best_points = None
-        best_area = 0
-
-        # 计算 poly1 中所有两个点组合的面积
-        for combo in combinations(poly1_coords, 2):
-            if tuple(combo[0]) not in common_coords and tuple(combo[1]) not in common_coords:
-                test_polygon = common_coords + [tuple(combo[0]), tuple(combo[1])]
-                area = calculate_area(test_polygon)
-
-                # 选择能让面积最大的两个点组合
-                if area > best_area:
-                    best_points = (tuple(combo[0]), tuple(combo[1]))
-                    best_area = area
-
-        if best_points:
-            common_coords.extend(best_points)
-
-    # 返回最终的 4 个点的多边形
-    return common_coords[:4]
+    return pixel_coords
 
 
 # 切割图片并保存
@@ -164,7 +106,6 @@ def process_annotations(dataset_name, original_image_path, matched_annotations):
             detected_polygon = annotation['polygon']  # 识别的多边形
 
             intersection_points = calculate_intersection(text_polygon, detected_polygon)
-            print(intersection_points)
             if not intersection_points:
                 continue
 
