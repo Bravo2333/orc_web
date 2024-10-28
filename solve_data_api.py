@@ -1,3 +1,5 @@
+import math
+
 import numpy as np
 from flask import Flask
 import requests
@@ -81,6 +83,32 @@ def save_cropped_image(original_image_path, polygon_coords, image_save_path):
     # 保存图片为 JPEG 格式
     cropped_image.save(image_save_path, format='JPEG')
 
+def round_points(points):
+    return [[math.ceil(point[0]), math.ceil(point[1])] for point in points]
+def convert_unicode(file_path):
+    with open(file_path, 'r', encoding='utf-8') as f:
+        content = f.read()
+
+    # 转换unicode字符
+    converted_content = content.encode().decode('unicode_escape')
+
+    with open(file_path, 'w', encoding='utf-8') as f:
+        f.write(converted_content)
+    valid_lines = []
+
+    # 读取文件并处理
+    with open(file_path, 'r', encoding='utf-8') as f:
+        for line in f:
+            # 提取 transcription 和 points 部分
+            image_path, json_data = line.strip().split('\t')
+            json_obj = json.loads(json_data)
+            # 对 points 中的小数进行向上取整
+            json_obj[0]['points'] = round_points(json_obj[0]['points'])
+            valid_lines.append(f"{image_path}\t{json.dumps(json_obj)}\n")
+    os.remove(file_path)
+    with open(file_path, 'w', encoding='utf-8') as f:
+        f.writelines(valid_lines)
+    print(f"文件 {file_path} 已更新。")
 
 def convert_to_relative_pixel_position(detected_polygon, intersection_points):
     """
@@ -121,6 +149,7 @@ def process_annotations(dataset_name, original_image_path, matched_annotations):
 
             label_entry = f"{img_filename}\t[{json.dumps(annotation_data)}]\n"
             label_file.write(label_entry)
+    convert_unicode(label_file_path)
 def r_and_p(dataset_name,image_name):
     if not image_name or not dataset_name:
         return jsonify({"error": "Missing parameters"}), 400
