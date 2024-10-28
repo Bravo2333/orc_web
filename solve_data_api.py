@@ -90,10 +90,12 @@ def convert_unicode(file_path):
         content = f.read()
 
     # 转换unicode字符
-    converted_content = content.encode().decode('unicode_escape')
+    converted_content = content.encode('utf-8').decode('unicode_escape')
 
     with open(file_path, 'w', encoding='utf-8') as f:
         f.write(converted_content)
+
+        
     valid_lines = []
 
     # 读取文件并处理
