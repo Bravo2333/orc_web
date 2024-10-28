@@ -1,4 +1,5 @@
 import math
+import re
 
 import numpy as np
 from flask import Flask
@@ -85,17 +86,21 @@ def save_cropped_image(original_image_path, polygon_coords, image_save_path):
 
 def round_points(points):
     return [[math.ceil(point[0]), math.ceil(point[1])] for point in points]
+def add_slash_to_unicode(match):
+    # 获取匹配的Unicode字符
+    unicode_char = match.group(0)
+    # 将字符前添加斜杠
+    stra = f"/{unicode_char}"
+    return stra.encode('utf-8').decode('unicode_escape')
 def convert_unicode(file_path):
     with open(file_path, 'r', encoding='utf-8') as f:
         content = f.read()
-
-    # 转换unicode字符
-    converted_content = content.encode('utf-8').decode('unicode_escape')
+    converted_content = re.sub(r'\\u[0-9a-fA-F]{4}', add_slash_to_unicode, content)
 
     with open(file_path, 'w', encoding='utf-8') as f:
         f.write(converted_content)
 
-        
+
     valid_lines = []
 
     # 读取文件并处理
