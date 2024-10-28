@@ -12,6 +12,7 @@ from itertools import combinations
 import utils
 from extensions import db
 from datasets_api import Data, Dataset
+import shutil
 import os
 # 创建蓝图
 solve_data_api = Blueprint('solve_data_api', __name__)
@@ -96,10 +97,10 @@ def convert_to_relative_pixel_position(detected_polygon, intersection_points):
 # 主函数：处理标注数据，生成新的数据集
 def process_annotations(dataset_name, original_image_path, matched_annotations):
     images_folder, label_file_path = create_dataset_folders(dataset_name)
+    shutil.copy(original_image_path, images_folder)
 
     # 打开标注文件
     with open(label_file_path, 'a') as label_file:
-        img_count = 1
 
         for annotation in matched_annotations:
             text_polygon = annotation['points']  # 标注信息的多边形
@@ -109,29 +110,18 @@ def process_annotations(dataset_name, original_image_path, matched_annotations):
             if not intersection_points:
                 continue
 
-            img_filename = f"img_{original_image_path.split('/')[-1].split('.')[0]}_{img_count}.jpg"
-            image_save_path = os.path.join(images_folder, img_filename)
+            img_filename = original_image_path.split('/')[-1]
 
             # 切割并保存图片
-            save_cropped_image(original_image_path, detected_polygon, image_save_path)
 
             annotation_data = {
                 "transcription": annotation['text'],
                 "points": convert_to_relative_pixel_position(detected_polygon, intersection_points)
             }
 
-            label_entry = f"images/{img_filename}\t[{json.dumps(annotation_data)}]\n"
+            label_entry = f"{img_filename}\t[{json.dumps(annotation_data)}]\n"
             label_file.write(label_entry)
-
-            img_count += 1
-
-
-# API：发送图片到识别 API，获取多边形列表，匹配标注信息并生成数据集
-@solve_data_api.route('/recognize_and_process', methods=['POST'])
-def recognize_and_process():
-    image_name = request.form.get('image_name')
-    dataset_name = request.form.get('dataset_name')
-
+def r_and_p(dataset_name,image_name):
     if not image_name or not dataset_name:
         return jsonify({"error": "Missing parameters"}), 400
     pic_path = os.path.join('datasets',dataset_name,image_name)
@@ -174,7 +164,6 @@ def recognize_and_process():
                 matched_annotations.append({
                     'text': annotation.text,
                     'polygon': polygon_coords,
-
                     'points': points
                     # 标注多边形
                 })
@@ -182,6 +171,19 @@ def recognize_and_process():
 
     # 处理匹配后的数据并生成新的数据集
     process_annotations(dataset_name, pic_path, matched_annotations)
+
+
+# API：发送图片到识别 API，获取多边形列表，匹配标注信息并生成数据集
+@solve_data_api.route('/recognize_and_process', methods=['POST'])
+def recognize_and_process():
+    dataset_name = request.form.get('dataset_name')
+    filelist = os.listdir("./datasets/"+dataset_name)
+    image_names=[]
+    for i in filelist:
+        if i.endswith('.jpg') or i.endswith('.png'):
+            image_names.append(i)
+    for i in image_names:
+        r_and_p(dataset_name,i)
 
     return jsonify({"success": True, "message": "Dataset created and annotations processed"}), 200
 
