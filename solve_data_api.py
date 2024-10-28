@@ -93,12 +93,12 @@ def add_slash_to_unicode(match):
     stra = f"/{unicode_char}"
     return stra.encode('utf-8').decode('unicode_escape')
 def convert_unicode(file_path):
-    with open(file_path, 'r', encoding='utf-8') as f:
-        content = f.read()
-    converted_content = re.sub(r'\\u[0-9a-fA-F]{4}', add_slash_to_unicode, content)
-
-    with open(file_path, 'w', encoding='utf-8') as f:
-        f.write(converted_content)
+    # with open(file_path, 'r', encoding='utf-8') as f:
+    #     content = f.read()
+    # converted_content = re.sub(r'\\u[0-9a-fA-F]{4}', add_slash_to_unicode, content)
+    #
+    # with open(file_path, 'w', encoding='utf-8') as f:
+    #     f.write(converted_content)
 
 
     valid_lines = []
