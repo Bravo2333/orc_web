@@ -118,8 +118,8 @@ def convert_unicode(file_path):
     print(f"文件 {file_path} 已更新。")
 
 def convert_total(file_path):
+    data_dict = {}
     with open(file_path, 'r', encoding='utf-8') as f:
-        data_dict = {}
         for line in f:
             # 去掉行末的换行符
             line = line.strip()
