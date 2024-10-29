@@ -132,7 +132,7 @@ def convert_total(file_path):
                 data_dict[filename] = []
             # 将JSON对象添加到对应的数组中
             data_dict[filename].append(json_obj[0])
-
+    print(data_dict)
     # 将字典写入输出文件
     with open(file_path, 'w', encoding='utf-8') as f:
         for filename, json_list in data_dict.items():
