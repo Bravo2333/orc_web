@@ -132,7 +132,6 @@ def convert_total(file_path):
                 data_dict[filename] = []
             # 将JSON对象添加到对应的数组中
             data_dict[filename].append(json_obj[0])
-    print(data_dict)
     # 将字典写入输出文件
     with open(file_path, 'w', encoding='utf-8') as f:
         for filename, json_list in data_dict.items():
@@ -181,7 +180,6 @@ def process_annotations(dataset_name, original_image_path, matched_annotations):
             label_entry = f"{img_filename}\t[{json.dumps(annotation_data)}]\n"
             label_file.write(label_entry)
     convert_unicode(label_file_path)
-    convert_total(label_file_path)
 
 def r_and_p(dataset_name,image_name):
     if not image_name or not dataset_name:
@@ -246,6 +244,8 @@ def recognize_and_process():
             image_names.append(i)
     for i in image_names:
         r_and_p(dataset_name,i)
+
+    convert_total("./annotation_Dataset/"+dataset_name+"/label.txt")
 
     return jsonify({"success": True, "message": "Dataset created and annotations processed"}), 200
 
