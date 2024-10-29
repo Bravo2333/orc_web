@@ -4,7 +4,7 @@ import re
 import numpy as np
 from flask import Flask
 import requests
-from shapely.geometry import Polygon,Point
+from shapely.geometry import Polygon, Point
 from PIL import Image
 import json
 from datetime import datetime
@@ -17,6 +17,7 @@ from extensions import db
 from datasets_api import Data, Dataset
 import shutil
 import os
+
 # 创建蓝图
 solve_data_api = Blueprint('solve_data_api', __name__)
 CORS(solve_data_api)
@@ -84,14 +85,19 @@ def save_cropped_image(original_image_path, polygon_coords, image_save_path):
     # 保存图片为 JPEG 格式
     cropped_image.save(image_save_path, format='JPEG')
 
+
 def round_points(points):
     return [[math.ceil(point[0]), math.ceil(point[1])] for point in points]
+
+
 def add_slash_to_unicode(match):
     # 获取匹配的Unicode字符
     unicode_char = match.group(0)
     # 将字符前添加斜杠
     stra = f"/{unicode_char}"
     return stra.encode('utf-8').decode('unicode_escape')
+
+
 def convert_unicode(file_path):
     # with open(file_path, 'r', encoding='utf-8') as f:
     #     content = f.read()
@@ -100,22 +106,28 @@ def convert_unicode(file_path):
     # with open(file_path, 'w', encoding='utf-8') as f:
     #     f.write(converted_content)
 
-
-    valid_lines = []
+    valid_lines = ""
 
     # 读取文件并处理
     with open(file_path, 'r', encoding='utf-8') as f:
+        json_objs = []
+        line = f.readline()
+        image_path, json_data = line.strip().split('\t')
+        valid_lines += image_path + '\t'
         for line in f:
             # 提取 transcription 和 points 部分
             image_path, json_data = line.strip().split('\t')
             json_obj = json.loads(json_data)
             # 对 points 中的小数进行向上取整
             json_obj[0]['points'] = round_points(json_obj[0]['points'])
-            valid_lines.append(f"{image_path}\t{json.dumps(json_obj)}\n")
+            json_objs.append(json_obj)
+            # valid_lines.append(f"{image_path}\t{json.dumps(json_obj)}\n")
+        valid_lines += json.dumps(json_objs) + '\n'
     os.remove(file_path)
     with open(file_path, 'w', encoding='utf-8') as f:
         f.writelines(valid_lines)
     print(f"文件 {file_path} 已更新。")
+
 
 def convert_to_relative_pixel_position(detected_polygon, intersection_points):
     """
@@ -128,6 +140,7 @@ def convert_to_relative_pixel_position(detected_polygon, intersection_points):
     relative_points = [[point[0] - reference_point[0], point[1] - reference_point[1]] for point in intersection_points]
 
     return relative_points
+
 
 # 主函数：处理标注数据，生成新的数据集
 def process_annotations(dataset_name, original_image_path, matched_annotations):
@@ -157,10 +170,12 @@ def process_annotations(dataset_name, original_image_path, matched_annotations):
             label_entry = f"{img_filename}\t[{json.dumps(annotation_data)}]\n"
             label_file.write(label_entry)
     convert_unicode(label_file_path)
-def r_and_p(dataset_name,image_name):
+
+
+def r_and_p(dataset_name, image_name):
     if not image_name or not dataset_name:
         return jsonify({"error": "Missing parameters"}), 400
-    pic_path = os.path.join('datasets',dataset_name,image_name)
+    pic_path = os.path.join('datasets', dataset_name, image_name)
     base64_image = utils.image_to_base64(pic_path)
 
     # 准备POST请求的Payload
@@ -213,13 +228,12 @@ def r_and_p(dataset_name,image_name):
 @solve_data_api.route('/recognize_and_process', methods=['POST'])
 def recognize_and_process():
     dataset_name = request.form.get('dataset_name')
-    filelist = os.listdir("./datasets/"+dataset_name)
-    image_names=[]
+    filelist = os.listdir("./datasets/" + dataset_name)
+    image_names = []
     for i in filelist:
         if i.endswith('.jpg') or i.endswith('.png'):
             image_names.append(i)
     for i in image_names:
-        r_and_p(dataset_name,i)
+        r_and_p(dataset_name, i)
 
     return jsonify({"success": True, "message": "Dataset created and annotations processed"}), 200
-
