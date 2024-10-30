@@ -161,12 +161,12 @@ def process_annotations(dataset_name, original_image_path, matched_annotations):
     with open(label_file_path, 'a') as label_file:
 
         for annotation in matched_annotations:
-            text_polygon = annotation['points']  # 标注信息的多边形
-            detected_polygon = annotation['polygon']  # 识别的多边形
-
-            intersection_points = calculate_intersection(text_polygon, detected_polygon)
-            if not intersection_points:
-                continue
+            # text_polygon = annotation['points']  # 标注信息的多边形
+            # detected_polygon = annotation['polygon']  # 识别的多边形
+            #
+            # intersection_points = calculate_intersection(text_polygon, detected_polygon)
+            # if not intersection_points:
+            #     continue
 
             img_filename = original_image_path.split('/')[-1]
 
@@ -174,7 +174,8 @@ def process_annotations(dataset_name, original_image_path, matched_annotations):
 
             annotation_data = {
                 "transcription": annotation['text'],
-                "points": convert_to_relative_pixel_position(detected_polygon, intersection_points)
+                # "points": convert_to_relative_pixel_position(detected_polygon, intersection_points)
+                "points": annotation['points']
             }
 
             label_entry = f"{img_filename}\t[{json.dumps(annotation_data)}]\n"
@@ -212,23 +213,34 @@ def r_and_p(dataset_name,image_name):
         return jsonify({"error": "No annotations found for this image"}), 404
 
     # 匹配标注信息和多边形
+    # matched_annotations = []
+    # for annotation in annotations:
+    #     centroid = calculate_centroid(annotation.coordinates)
+    #
+    #     for polygon in polygons:
+    #         polygon_coords = [(polygon[i], polygon[i + 1]) for i in range(0, len(polygon), 2)]
+    #         if Polygon(polygon_coords).contains(Point(centroid)):
+    #             coords_list = [float(c) for c in annotation.coordinates.split(',')]
+    #             points = [(coords_list[i], coords_list[i + 1]) for i in range(0, len(coords_list), 2)]
+    #             matched_annotations.append({
+    #                 'text': annotation.text,
+    #                 'polygon': polygon_coords,
+    #                 'points': points
+    #                 # 标注多边形
+    #             })
+    #             break
+
+    # 直接整理标注信息
     matched_annotations = []
     for annotation in annotations:
         centroid = calculate_centroid(annotation.coordinates)
 
-        for polygon in polygons:
-            polygon_coords = [(polygon[i], polygon[i + 1]) for i in range(0, len(polygon), 2)]
-            if Polygon(polygon_coords).contains(Point(centroid)):
-                coords_list = [float(c) for c in annotation.coordinates.split(',')]
-                points = [(coords_list[i], coords_list[i + 1]) for i in range(0, len(coords_list), 2)]
-                matched_annotations.append({
-                    'text': annotation.text,
-                    'polygon': polygon_coords,
-                    'points': points
-                    # 标注多边形
-                })
-                break
-
+        matched_annotations.append({
+            'text': annotation.text,
+            'polygon': "",
+            'points': centroid
+            # 标注多边形
+        })
     # 处理匹配后的数据并生成新的数据集
     process_annotations(dataset_name, pic_path, matched_annotations)
 
