@@ -193,10 +193,10 @@ def r_and_p(dataset_name,image_name):
         "image": base64_image
     }
     # 发送POST请求到Flask服务
-    response = requests.post('http://127.0.0.1:5000/api/recognize', json=payload)
-    data = response.json()
-
-    polygons = data['polygons']
+    # response = requests.post('http://127.0.0.1:5000/api/recognize', json=payload)
+    # data = response.json()
+    #
+    # polygons = data['polygons']
 
     # 获取数据库中的标注信息
     image_name = image_name.split('.')[0]
