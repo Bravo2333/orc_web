@@ -38,11 +38,11 @@ def create_dataset_folders(dataset_name):
 def calculate_centroid(coordinates_str):
     coords = [float(coord) for coord in coordinates_str.split(',')]
     points = [(coords[i], coords[i + 1]) for i in range(0, len(coords), 2)]
-    x_coords = [p[0] for p in points]
-    y_coords = [p[1] for p in points]
-    centroid_x = sum(x_coords) / len(points)
-    centroid_y = sum(y_coords) / len(points)
-    return centroid_x, centroid_y
+    # x_coords = [p[0] for p in points]
+    # y_coords = [p[1] for p in points]
+    # centroid_x = sum(x_coords) / len(points)
+    # centroid_y = sum(y_coords) / len(points)
+    return points
 
 
 # 计算多边形交集，并保留 poly2 中的边，凑够 4 个点，选择 poly1 中能最大化面积的点
