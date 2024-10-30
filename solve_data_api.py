@@ -202,12 +202,12 @@ def r_and_p(dataset_name,image_name):
     image_name = image_name.split('.')[0]
     dataset = Dataset.query.filter_by(name=dataset_name).first()
     dataset_id = dataset.id
-    data_entries = Data.query.filter_by(dataset_id=dataset_id).all()
-    result = []
-    for i in data_entries:
-        if image_name[9:] in i.image_path.split('/')[-1]:
-            result.append(i)
-    annotations = result
+    data_entries = Data.query.filter_by(dataset_id=dataset_id).filter(Data.image_path.contains(str(image_name[9:]))).all()
+    # result = []
+    # for i in data_entries:
+    #     if image_name[9:] in i.image_path.split('/')[-1]:
+    #         result.append(i)
+    annotations = data_entries
 
     if not annotations:
         return jsonify({"error": "No annotations found for this image"}), 404
