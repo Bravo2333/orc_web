@@ -36,7 +36,7 @@ def create_dataset_folders(dataset_name):
 
 # 计算坐标的质心
 def calculate_centroid(coordinates_str):
-    coords = [float(coord) for coord in coordinates_str.split(',')]
+    coords = [int(coord) for coord in coordinates_str.split(',')]
     points = [(coords[i], coords[i + 1]) for i in range(0, len(coords), 2)]
     # x_coords = [p[0] for p in points]
     # y_coords = [p[1] for p in points]
