@@ -180,7 +180,7 @@ def process_annotations(dataset_name, original_image_path, matched_annotations):
 
             label_entry = f"{img_filename}\t[{json.dumps(annotation_data)}]\n"
             label_file.write(label_entry)
-    convert_unicode(label_file_path)
+    # convert_unicode(label_file_path)
 
 def r_and_p(dataset_name,image_name):
     if not image_name or not dataset_name:
@@ -255,6 +255,7 @@ def recognize_and_process():
         if i.endswith('.jpg') or i.endswith('.png'):
             image_names.append(i)
     for i in image_names:
+        print(i)
         r_and_p(dataset_name,i)
 
     convert_total("./annotation_Dataset/"+dataset_name+"/label.txt")
