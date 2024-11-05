@@ -308,8 +308,8 @@ def recognize_and_process():
 
     return jsonify({"success": True, "message": "Dataset created and annotations processed"}), 2003
 
-@solve_data_api.route('/r_and_p_rec', methods=['POST'])
-def recognize_and_process():
+@solve_data_api.route('/recognize_and_process_rec', methods=['POST'])
+def recognize_and_p():
     dataset_name = request.form.get('dataset_name')
     filelist = os.listdir("./datasets/"+dataset_name)
     image_names=[]
