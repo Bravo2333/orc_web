@@ -4,7 +4,7 @@ import re
 import numpy as np
 from flask import Flask
 import requests
-from shapely.geometry import Polygon,Point
+from shapely.geometry import Polygon, Point
 from PIL import Image
 import json
 from datetime import datetime
@@ -17,6 +17,7 @@ from extensions import db
 from datasets_api import Data, Dataset
 import shutil
 import os
+
 # 创建蓝图
 solve_data_api = Blueprint('solve_data_api', __name__)
 CORS(solve_data_api)
@@ -32,6 +33,8 @@ def create_dataset_folders(dataset_name):
     os.makedirs(images_folder, exist_ok=True)
 
     return images_folder, label_file_path
+
+
 def create_dataset_folders_rec(dataset_name):
     dataset_folder = os.path.join("annotation_Dataset_rec", dataset_name)
     images_folder = os.path.join(dataset_folder, "images")
@@ -93,14 +96,19 @@ def save_cropped_image(original_image_path, polygon_coords, image_save_path):
     # 保存图片为 JPEG 格式
     cropped_image.save(image_save_path, format='JPEG')
 
+
 def round_points(points):
     return [[math.ceil(point[0]), math.ceil(point[1])] for point in points]
+
+
 def add_slash_to_unicode(match):
     # 获取匹配的Unicode字符
     unicode_char = match.group(0)
     # 将字符前添加斜杠
     stra = f"/{unicode_char}"
     return stra.encode('utf-8').decode('unicode_escape')
+
+
 def convert_unicode(file_path):
     # with open(file_path, 'r', encoding='utf-8') as f:
     #     content = f.read()
@@ -108,7 +116,6 @@ def convert_unicode(file_path):
     #
     # with open(file_path, 'w', encoding='utf-8') as f:
     #     f.write(converted_content)
-
 
     valid_lines = []
 
@@ -125,6 +132,7 @@ def convert_unicode(file_path):
     with open(file_path, 'w', encoding='utf-8') as f:
         f.writelines(valid_lines)
     print(f"文件 {file_path} 已更新。")
+
 
 def convert_total(file_path):
     data_dict = {}
@@ -161,6 +169,7 @@ def convert_to_relative_pixel_position(detected_polygon, intersection_points):
 
     return relative_points
 
+
 # 主函数：处理标注数据，生成新的数据集
 def process_annotations(dataset_name, original_image_path, matched_annotations):
     images_folder, label_file_path = create_dataset_folders(dataset_name)
@@ -168,7 +177,6 @@ def process_annotations(dataset_name, original_image_path, matched_annotations):
 
     # 打开标注文件
     with open(label_file_path, 'a') as label_file:
-
         for annotation in matched_annotations:
             # text_polygon = annotation['points']  # 标注信息的多边形
             # detected_polygon = annotation['polygon']  # 识别的多边形
@@ -190,6 +198,8 @@ def process_annotations(dataset_name, original_image_path, matched_annotations):
             label_entry = f"{img_filename}\t[{json.dumps(annotation_data)}]\n"
             label_file.write(label_entry)
     # convert_unicode(label_file_path)
+
+
 def process_annotations_rec(dataset_name, original_image_path, matched_annotations):
     images_folder, label_file_path = create_dataset_folders_rec(dataset_name)
     shutil.copy(original_image_path, images_folder)
@@ -205,17 +215,19 @@ def process_annotations_rec(dataset_name, original_image_path, matched_annotatio
             # if not intersection_points:
             #     continue
             temp = original_image_path.split('/')[-1].split('.')
-            img_filename = str(temp[0])+'_'+str(num)+str(temp[1:])
+            img_filename = str(temp[0]) + '_' + str(num) + str(temp[1:])
             # 切割并保存图片
-            save_cropped_image(os.path.join("annotation_Dataset_rec", dataset_name,original_image_path.split('/')[-1]),annotation['points'],os.path.join(images_folder,img_filename))
+            save_cropped_image(os.path.join("annotation_Dataset_rec", dataset_name, original_image_path.split('/')[-1]),
+                               annotation['points'], os.path.join(images_folder, img_filename))
             label_entry = f"{img_filename}\t[{annotation['text']}]\n"
             label_file.write(label_entry)
     # convert_unicode(label_file_path)
 
-def r_and_p(dataset_name,image_name):
+
+def r_and_p(dataset_name, image_name):
     if not image_name or not dataset_name:
         return jsonify({"error": "Missing parameters"}), 400
-    pic_path = os.path.join('datasets',dataset_name,image_name)
+    pic_path = os.path.join('datasets', dataset_name, image_name)
     base64_image = utils.image_to_base64(pic_path)
 
     # 准备POST请求的Payload
@@ -232,7 +244,8 @@ def r_and_p(dataset_name,image_name):
     image_name = image_name.split('.')[0]
     dataset = Dataset.query.filter_by(name=dataset_name).first()
     dataset_id = dataset.id
-    data_entries = Data.query.filter_by(dataset_id=dataset_id).filter(Data.image_path.contains(str(image_name[9:]))).all()
+    data_entries = Data.query.filter_by(dataset_id=dataset_id).filter(
+        Data.image_path.contains(str(image_name[9:]))).all()
     # result = []
     # for i in data_entries:
     #     if image_name[9:] in i.image_path.split('/')[-1]:
@@ -274,51 +287,66 @@ def r_and_p(dataset_name,image_name):
     # 处理匹配后的数据并生成新的数据集
     process_annotations(dataset_name, pic_path, annotations)
 
-def r_and_p_rec(dataset_name,image_name):
+
+def r_and_p_rec(dataset_name, image_name):
     if not image_name or not dataset_name:
         return jsonify({"error": "Missing parameters"}), 400
-    pic_path = os.path.join('datasets',dataset_name,image_name)
+    pic_path = os.path.join('datasets', dataset_name, image_name)
 
     # 获取数据库中的标注信息
     image_name = image_name.split('.')[0]
     dataset = Dataset.query.filter_by(name=dataset_name).first()
     dataset_id = dataset.id
-    data_entries = Data.query.filter_by(dataset_id=dataset_id).filter(Data.image_path.contains(str(image_name[9:]))).all()
+    data_entries = Data.query.filter_by(dataset_id=dataset_id).filter(
+        Data.image_path.contains(str(image_name[9:]))).all()
     # result = []
     # for i in data_entries:
     #     if image_name[9:] in i.image_path.split('/')[-1]:
     #         result.append(i)
     annotations = data_entries
+
+    matched_annotations = []
+    for annotation in annotations:
+        centroid = calculate_centroid(annotation.coordinates)
+
+        matched_annotations.append({
+            'text': annotation.text,
+            'polygon': "",
+            'points': centroid
+            # 标注多边形
+        })
     # 处理匹配后的数据并生成新的数据集
-    process_annotations_rec(dataset_name, pic_path, annotations)
+    process_annotations_rec(dataset_name, pic_path, matched_annotations)
+
+
 # API：发送图片到识别 API，获取多边形列表，匹配标注信息并生成数据集
 @solve_data_api.route('/recognize_and_process', methods=['POST'])
 def recognize_and_process():
     dataset_name = request.form.get('dataset_name')
-    filelist = os.listdir("./datasets/"+dataset_name)
-    image_names=[]
+    filelist = os.listdir("./datasets/" + dataset_name)
+    image_names = []
     for i in filelist:
         if i.endswith('.jpg') or i.endswith('.png'):
             image_names.append(i)
     for i in image_names:
         print(i)
-        r_and_p(dataset_name,i)
+        r_and_p(dataset_name, i)
 
-    convert_total("./annotation_Dataset/"+dataset_name+"/label.txt")
+    convert_total("./annotation_Dataset/" + dataset_name + "/label.txt")
 
     return jsonify({"success": True, "message": "Dataset created and annotations processed"}), 2003
+
 
 @solve_data_api.route('/recognize_and_process_rec', methods=['POST'])
 def recognize_and_p():
     dataset_name = request.form.get('dataset_name')
-    filelist = os.listdir("./datasets/"+dataset_name)
-    image_names=[]
+    filelist = os.listdir("./datasets/" + dataset_name)
+    image_names = []
     for i in filelist:
         if i.endswith('.jpg') or i.endswith('.png'):
             image_names.append(i)
     for i in image_names:
         print(i)
-        r_and_p_rec(dataset_name,i)
+        r_and_p_rec(dataset_name, i)
 
     return jsonify({"success": True, "message": "Dataset created and annotations processed"}), 2003
-
