@@ -202,7 +202,7 @@ def process_annotations(dataset_name, original_image_path, matched_annotations):
 
 def process_annotations_rec(dataset_name, original_image_path, matched_annotations):
     images_folder, label_file_path = create_dataset_folders_rec(dataset_name)
-    shutil.copy(original_image_path, images_folder)
+    shutil.copy(original_image_path, os.path.join("annotation_Dataset_rec", dataset_name))
 
     # 打开标注文件
     with open(label_file_path, 'a') as label_file:
