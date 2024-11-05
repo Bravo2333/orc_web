@@ -81,20 +81,25 @@ def calculate_intersection(poly1, poly2):
 
 
 # 切割图片并保存
-def save_cropped_image(original_image_path, polygon_coords, image_save_path):
-    image = Image.open(original_image_path)
+def save_cropped_image(original_image_path, matched_annotations):
+    num = 0
+    for i in matched_annotations:
+        image = Image.open(original_image_path)
 
-    # 获取多边形的最小边界框并切割图片
-    polygon = Polygon(polygon_coords)
-    bounds = polygon.bounds  # 获取多边形的最小边界框 (x_min, y_min, x_max, y_max)
-    cropped_image = image.crop(bounds)
+        # 获取多边形的最小边界框并切割图片
+        polygon = Polygon(i['points'])
+        bounds = polygon.bounds  # 获取多边形的最小边界框 (x_min, y_min, x_max, y_max)
+        cropped_image = image.crop(bounds)
 
-    # 如果图片是 RGBA 模式，将其转换为 RGB 模式
-    if cropped_image.mode == 'RGBA':
-        cropped_image = cropped_image.convert('RGB')
-
-    # 保存图片为 JPEG 格式
-    cropped_image.save(image_save_path, format='JPEG')
+        # 如果图片是 RGBA 模式，将其转换为 RGB 模式
+        if cropped_image.mode == 'RGBA':
+            cropped_image = cropped_image.convert('RGB')
+        temp = original_image_path.split('/')[-1].split('.')
+        img_filename = str(temp[0]) + '_' + str(num) + str(temp[1])
+        # 保存图片为 JPEG 格式
+        cropped_image.save(os.path.join("annotation_Dataset_rec", original_image_path.split('/')[1], img_filename),
+                           format='JPEG')
+        num += 1
 
 
 def round_points(points):
@@ -215,12 +220,12 @@ def process_annotations_rec(dataset_name, original_image_path, matched_annotatio
             # if not intersection_points:
             #     continue
             temp = original_image_path.split('/')[-1].split('.')
-            img_filename = str(temp[0]) + '_' + str(num) + str(temp[1:])
+            img_filename = str(temp[0]) + '_' + str(num) + str(temp[1])
             # 切割并保存图片
-            save_cropped_image(os.path.join("annotation_Dataset_rec", dataset_name, original_image_path.split('/')[-1]),
-                               annotation['points'], os.path.join(images_folder, img_filename))
-            label_entry = f"{img_filename}\t[{annotation['text']}]\n"
+            label_entry = f"{img_filename}\t{annotation['text']}\n"
             label_file.write(label_entry)
+            num += 1
+
     # convert_unicode(label_file_path)
 
 
@@ -317,6 +322,8 @@ def r_and_p_rec(dataset_name, image_name):
         })
     # 处理匹配后的数据并生成新的数据集
     process_annotations_rec(dataset_name, pic_path, matched_annotations)
+    return  pic_path, matched_annotations
+
 
 
 # API：发送图片到识别 API，获取多边形列表，匹配标注信息并生成数据集
@@ -342,11 +349,14 @@ def recognize_and_p():
     dataset_name = request.form.get('dataset_name')
     filelist = os.listdir("./datasets/" + dataset_name)
     image_names = []
+    params = []
     for i in filelist:
         if i.endswith('.jpg') or i.endswith('.png'):
             image_names.append(i)
     for i in image_names:
         print(i)
-        r_and_p_rec(dataset_name, i)
+        pic_path ,matched_annotations = r_and_p_rec(dataset_name, i)
+        params.append([os.path.join("annotation_Dataset_rec", dataset_name, pic_path.split('/')[-1]),matched_annotations])
+    utils.start_processing_with_multiprocessing(params)
 
     return jsonify({"success": True, "message": "Dataset created and annotations processed"}), 2003
