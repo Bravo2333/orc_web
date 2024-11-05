@@ -73,7 +73,7 @@ def start_processing_with_multiprocessing(params):
     processes = []
     for param in params:
         # 创建新进程，传入每一组参数
-        process = Process(target=crop_polygon_with_gpu, args=(param[0], param[1], result_dict,"cuda"))
+        process = Process(target=crop_polygon_with_gpu, args=(param[0], param[1], result_dict,"cpu"))
         processes.append(process)
         process.start()  # 启动进程
 
