@@ -205,7 +205,7 @@ def process_annotations_rec(dataset_name, original_image_path, matched_annotatio
             # if not intersection_points:
             #     continue
             temp = original_image_path.split('/')[-1].split('.')
-            img_filename = temp[0]+'_'+str(num)+temp[1:]
+            img_filename = str(temp[0])+'_'+str(num)+str(temp[1:])
             # 切割并保存图片
             save_cropped_image(os.path.join("annotation_Dataset_rec", dataset_name,original_image_path.split('/')[-1]),annotation['points'],os.path.join(images_folder,img_filename))
             label_entry = f"{img_filename}\t[{annotation['text']}]\n"
