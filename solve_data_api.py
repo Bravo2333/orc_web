@@ -204,7 +204,7 @@ def process_annotations_rec(dataset_name, original_image_path, matched_annotatio
             # intersection_points = calculate_intersection(text_polygon, detected_polygon)
             # if not intersection_points:
             #     continue
-            temp = original_image_path.split('/')[-1].split('.')+'_'+str(num)
+            temp = original_image_path.split('/')[-1].split('.')
             img_filename = temp[0]+'_'+str(num)+temp[1:]
             # 切割并保存图片
             save_cropped_image(os.path.join("annotation_Dataset_rec", dataset_name,original_image_path.split('/')[-1]),annotation['points'],os.path.join(images_folder,img_filename))
