@@ -32,6 +32,15 @@ def create_dataset_folders(dataset_name):
     os.makedirs(images_folder, exist_ok=True)
 
     return images_folder, label_file_path
+def create_dataset_folders_rec(dataset_name):
+    dataset_folder = os.path.join("annotation_Dataset_rec", dataset_name)
+    images_folder = os.path.join(dataset_folder, "images")
+    label_file_path = os.path.join(dataset_folder, "label.txt")
+
+    # 创建目录
+    os.makedirs(images_folder, exist_ok=True)
+
+    return images_folder, label_file_path
 
 
 # 计算坐标的质心
@@ -181,6 +190,27 @@ def process_annotations(dataset_name, original_image_path, matched_annotations):
             label_entry = f"{img_filename}\t[{json.dumps(annotation_data)}]\n"
             label_file.write(label_entry)
     # convert_unicode(label_file_path)
+def process_annotations_rec(dataset_name, original_image_path, matched_annotations):
+    images_folder, label_file_path = create_dataset_folders_rec(dataset_name)
+    shutil.copy(original_image_path, images_folder)
+
+    # 打开标注文件
+    with open(label_file_path, 'a') as label_file:
+        num = 1
+        for annotation in matched_annotations:
+            # text_polygon = annotation['points']  # 标注信息的多边形
+            # detected_polygon = annotation['polygon']  # 识别的多边形
+            #
+            # intersection_points = calculate_intersection(text_polygon, detected_polygon)
+            # if not intersection_points:
+            #     continue
+            temp = original_image_path.split('/')[-1].split('.')+'_'+str(num)
+            img_filename = temp[0]+'_'+str(num)+temp[1:]
+            # 切割并保存图片
+            save_cropped_image(os.path.join("annotation_Dataset_rec", dataset_name,original_image_path.split('/')[-1]),annotation['points'],os.path.join(images_folder,img_filename))
+            label_entry = f"{img_filename}\t[{annotation['text']}]\n"
+            label_file.write(label_entry)
+    # convert_unicode(label_file_path)
 
 def r_and_p(dataset_name,image_name):
     if not image_name or not dataset_name:
@@ -242,9 +272,25 @@ def r_and_p(dataset_name,image_name):
             # 标注多边形
         })
     # 处理匹配后的数据并生成新的数据集
-    process_annotations(dataset_name, pic_path, matched_annotations)
+    process_annotations(dataset_name, pic_path, annotations)
 
+def r_and_p_rec(dataset_name,image_name):
+    if not image_name or not dataset_name:
+        return jsonify({"error": "Missing parameters"}), 400
+    pic_path = os.path.join('datasets',dataset_name,image_name)
 
+    # 获取数据库中的标注信息
+    image_name = image_name.split('.')[0]
+    dataset = Dataset.query.filter_by(name=dataset_name).first()
+    dataset_id = dataset.id
+    data_entries = Data.query.filter_by(dataset_id=dataset_id).filter(Data.image_path.contains(str(image_name[9:]))).all()
+    # result = []
+    # for i in data_entries:
+    #     if image_name[9:] in i.image_path.split('/')[-1]:
+    #         result.append(i)
+    annotations = data_entries
+    # 处理匹配后的数据并生成新的数据集
+    process_annotations_rec(dataset_name, pic_path, annotations)
 # API：发送图片到识别 API，获取多边形列表，匹配标注信息并生成数据集
 @solve_data_api.route('/recognize_and_process', methods=['POST'])
 def recognize_and_process():
@@ -260,5 +306,19 @@ def recognize_and_process():
 
     convert_total("./annotation_Dataset/"+dataset_name+"/label.txt")
 
-    return jsonify({"success": True, "message": "Dataset created and annotations processed"}), 200
+    return jsonify({"success": True, "message": "Dataset created and annotations processed"}), 2003
+
+@solve_data_api.route('/recognize_and_process_rec', methods=['POST'])
+def recognize_and_process():
+    dataset_name = request.form.get('dataset_name')
+    filelist = os.listdir("./datasets/"+dataset_name)
+    image_names=[]
+    for i in filelist:
+        if i.endswith('.jpg') or i.endswith('.png'):
+            image_names.append(i)
+    for i in image_names:
+        print(i)
+        r_and_p_rec(dataset_name,i)
+
+    return jsonify({"success": True, "message": "Dataset created and annotations processed"}), 2003
 
