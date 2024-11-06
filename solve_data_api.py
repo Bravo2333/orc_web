@@ -1,19 +1,10 @@
 import math
-import re
-
-import numpy as np
-from flask import Flask
-import requests
-from shapely.geometry import Polygon, Point
+from shapely.geometry import Polygon
 from PIL import Image
 import json
-from datetime import datetime
-from flask_sqlalchemy import SQLAlchemy
-from flask import Blueprint, request, jsonify, send_from_directory
+from flask import Blueprint, request, jsonify
 from flask_cors import CORS
-from itertools import combinations
 import utils
-from extensions import db
 from datasets_api import Data, Dataset
 import shutil
 import os
@@ -115,13 +106,6 @@ def add_slash_to_unicode(match):
 
 
 def convert_unicode(file_path):
-    # with open(file_path, 'r', encoding='utf-8') as f:
-    #     content = f.read()
-    # converted_content = re.sub(r'\\u[0-9a-fA-F]{4}', add_slash_to_unicode, content)
-    #
-    # with open(file_path, 'w', encoding='utf-8') as f:
-    #     f.write(converted_content)
-
     valid_lines = []
 
     # 读取文件并处理
@@ -211,7 +195,7 @@ def process_annotations_rec(dataset_name, original_image_path, matched_annotatio
 
     # 打开标注文件
     with open(label_file_path, 'a') as label_file:
-        num = 1
+        num = 0
         for annotation in matched_annotations:
             # text_polygon = annotation['points']  # 标注信息的多边形
             # detected_polygon = annotation['polygon']  # 识别的多边形
@@ -220,7 +204,7 @@ def process_annotations_rec(dataset_name, original_image_path, matched_annotatio
             # if not intersection_points:
             #     continue
             temp = original_image_path.split('/')[-1].split('.')
-            img_filename = str(temp[0]) + '_' + str(num) + str(temp[1])
+            img_filename = str(temp[0]) + '_' + str(num) + "." + str(temp[1])
             # 切割并保存图片
             label_entry = f"{img_filename}\t{annotation['text']}\n"
             label_file.write(label_entry)
@@ -250,7 +234,7 @@ def r_and_p(dataset_name, image_name):
     dataset = Dataset.query.filter_by(name=dataset_name).first()
     dataset_id = dataset.id
     data_entries = Data.query.filter_by(dataset_id=dataset_id).filter(
-        Data.image_path.startswith("datasets/"+dataset_name+"/images/"+str(str(image_name[9:])+'_'))).all()
+        Data.image_path.startswith("datasets/" + dataset_name + "/images/" + str(str(image_name[9:]) + '_'))).all()
     # result = []
     # for i in data_entries:
     #     if image_name[9:] in i.image_path.split('/')[-1]:
@@ -303,13 +287,14 @@ def r_and_p_rec(dataset_name, image_name):
     dataset = Dataset.query.filter_by(name=dataset_name).first()
     dataset_id = dataset.id
     data_entries = Data.query.filter_by(dataset_id=dataset_id).filter(
-        Data.image_path.startswith("datasets/"+dataset_name+"/images/"+str(str(image_name[9:])+'_region'))).all()
+        Data.image_path.startswith(
+            "datasets/" + dataset_name + "/images/" + str(str(image_name[9:]) + '_region'))).all()
     # result = []
     # for i in data_entries:
     #     if image_name[9:] in i.image_path.split('/')[-1]:
     #         result.append(i)
     annotations = data_entries
-    print(len(annotations),str(str(image_name[9:])+'_'))
+    print(len(annotations), str(str(image_name[9:]) + '_'))
     matched_annotations = []
     for annotation in annotations:
         centroid = calculate_centroid(annotation.coordinates)
@@ -322,8 +307,7 @@ def r_and_p_rec(dataset_name, image_name):
         })
     # 处理匹配后的数据并生成新的数据集
     process_annotations_rec(dataset_name, pic_path, matched_annotations)
-    return  pic_path, matched_annotations
-
+    return pic_path, matched_annotations
 
 
 # API：发送图片到识别 API，获取多边形列表，匹配标注信息并生成数据集
@@ -355,8 +339,9 @@ def recognize_and_p():
             image_names.append(i)
     for i in image_names:
         print(i)
-        pic_path ,matched_annotations = r_and_p_rec(dataset_name, i)
-        params.append([os.path.join("annotation_Dataset_rec", dataset_name, pic_path.split('/')[-1]),matched_annotations])
+        pic_path, matched_annotations = r_and_p_rec(dataset_name, i)
+        params.append(
+            [os.path.join("annotation_Dataset_rec", dataset_name, pic_path.split('/')[-1]), matched_annotations])
     utils.start_processing_with_multiprocessing(params)
 
     return jsonify({"success": True, "message": "Dataset created and annotations processed"}), 2003
