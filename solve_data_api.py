@@ -250,7 +250,7 @@ def r_and_p(dataset_name, image_name):
     dataset = Dataset.query.filter_by(name=dataset_name).first()
     dataset_id = dataset.id
     data_entries = Data.query.filter_by(dataset_id=dataset_id).filter(
-        Data.image_path.contains(str(image_name[9:]))).all()
+        Data.image_path.startswith("datasets/"+dataset_name+"/images/"+str(str(image_name[9:])+'_'))).all()
     # result = []
     # for i in data_entries:
     #     if image_name[9:] in i.image_path.split('/')[-1]:
@@ -303,7 +303,7 @@ def r_and_p_rec(dataset_name, image_name):
     dataset = Dataset.query.filter_by(name=dataset_name).first()
     dataset_id = dataset.id
     data_entries = Data.query.filter_by(dataset_id=dataset_id).filter(
-        Data.image_path.contains(str(str(image_name[9:])+'_'))).all()
+        Data.image_path.startswith("datasets/"+dataset_name+"/images/"+str(str(image_name[9:])+'_'))).all()
     # result = []
     # for i in data_entries:
     #     if image_name[9:] in i.image_path.split('/')[-1]:
