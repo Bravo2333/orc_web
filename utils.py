@@ -20,48 +20,47 @@ def image_to_gpu_tensor(image):
 
 # 通过 GPU 执行多边形裁剪
 def crop_polygon_with_gpu(image_path, annotations, result_dict, progress_queue, device):
-    num = 0
     image = Image.open(image_path)
-    image_tensor = image_to_gpu_tensor(image).to(device)  # 将图像数据加载到 GPU
 
     total_annotations = len(annotations)
     for index, annotation in enumerate(annotations):
         polygon = Polygon(annotation['points'])
 
-        # 创建掩码图像
+        # 获取多边形的最小边界框
+        x_min, y_min, x_max, y_max = polygon.bounds
+        x_min, y_min, x_max, y_max = map(int, [x_min, y_min, x_max, y_max])
+
+        # 裁剪图像的边界框区域
+        cropped_image = image.crop((x_min, y_min, x_max, y_max))
+        cropped_tensor = image_to_gpu_tensor(cropped_image).to(device)
+
+        # 创建掩码图像并裁剪到同样的边界框
         mask = Image.new('L', image.size, 0)
         draw = ImageDraw.Draw(mask)
         draw.polygon(polygon.exterior.coords, fill=255)
-
-        # 将掩码加载到 GPU
-        mask_tensor = torch.tensor(np.array(mask), dtype=torch.float32).to(device) / 255.0
+        mask_cropped = mask.crop((x_min, y_min, x_max, y_max))
+        mask_tensor = torch.tensor(np.array(mask_cropped), dtype=torch.float32).to(device) / 255.0
 
         # 使用掩码提取多边形区域
-        cropped_image_tensor = image_tensor * mask_tensor.unsqueeze(0)
+        final_cropped_tensor = cropped_tensor * mask_tensor.unsqueeze(0)
 
         # 将裁剪结果转回 CPU
-        cropped_image_np = cropped_image_tensor.permute(1, 2, 0).cpu().numpy()
+        final_cropped_np = final_cropped_tensor.permute(1, 2, 0).cpu().numpy()
 
-        # 只保留非零区域（即多边形区域），将背景设为透明
-        cropped_image_np = (cropped_image_np * 255).astype(np.uint8)
-        mask_np = (mask_tensor.cpu().numpy() * 255).astype(np.uint8)
+        # 设置背景为白色（或透明）
+        final_cropped_np[mask_tensor.cpu().numpy() == 0] = 255  # 白色背景
 
-        # 生成只保留多边形区域的图像
-        cropped_image_np[mask_np == 0] = 255  # 设置背景为白色（可以根据需要更改为透明）
-
-        # 保存裁剪图像
+        # 保存仅包含多边形区域的裁剪图像
         temp = image_path.split('/')[-1].split('.')
-        img_filename = f"{temp[0]}_{num}.{temp[1]}"
+        img_filename = f"{temp[0]}_{index}.{temp[1]}"
 
-        save_path = os.path.join("annotation_Dataset_rec", image_path.split('/')[1])
+        save_path = os.path.join("annotation_Dataset_rec", "images",image_path.split('/')[1])
         os.makedirs(save_path, exist_ok=True)
 
-        cropped_image = Image.fromarray(cropped_image_np)
-        cropped_image.save(os.path.join(save_path, img_filename), format='JPEG')
+        final_image = Image.fromarray((final_cropped_np * 255).astype(np.uint8))
+        final_image.save(os.path.join(save_path, img_filename), format='JPEG')
 
-        num += 1
-
-        # 将进度信息放入队列
+        # 更新进度信息
         progress_queue.put((image_path, index + 1, total_annotations))
 
     result_dict[image_path] = f"{len(annotations)} images processed."
