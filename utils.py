@@ -54,7 +54,7 @@ def crop_polygon_with_gpu(image_path, annotations, result_dict, progress_queue, 
         temp = image_path.split('/')[-1].split('.')
         img_filename = f"{temp[0]}_{index}.{temp[1]}"
 
-        save_path = os.path.join("annotation_Dataset_rec", "images",image_path.split('/')[1])
+        save_path = os.path.join("annotation_Dataset_rec",image_path.split('/')[1])
         os.makedirs(save_path, exist_ok=True)
 
         final_image = Image.fromarray((final_cropped_np * 255).astype(np.uint8))
